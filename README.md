@@ -28,6 +28,8 @@ The /e and /s arguments are used when you need to transform the paths into the f
 It generated generic coverage format that you can feed then in sonar using sonar.coverageReportPaths see https://docs.sonarqube.org/display/SONAR/Generic+Test+Data 
 It generates json coverage format for https://github.com/jmecsoftware/sonarqube-testdata-plugin 
 
+The argument /x will perform conversion to generic test data, by default the converter generates json coverage that you can use with the testdata-plugin
+
 ## Why the json coverage
 You must be asking why another coverage format? The generic test data is indeed a good approach, and this format would not be needed if the generic test data would support merging condition coverage. 
 The xml format provides only conditions and covered conditions. So if you have 2 reports with different data the behaviour becomes undefined. To support this, the branch/conditions must be present in the report. the test-data-plugin does exactly that. 
