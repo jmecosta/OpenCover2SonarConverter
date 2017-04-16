@@ -19,7 +19,7 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
     "    /S|/s:<Search string for path replace in report>"
     "    /R|/r:<covert reports : search string>"
     "    /O|/o:<out file>"
-    "    /X|/x:<output xml>"
+    "    /X|/x:<generic test data format>"
 
 ### /e /s arguments
 The /e and /s arguments are used when you need to transform the paths into the final analysis folder. For example in teamcity its common, that checkout folders to be named like c:\buildagent\<hash>. This hash normally its not guaranted to be the same when you move reports between agents. With this 2 arguments you can transform those path to the paths the sonar analysis actually uses.
