@@ -21,6 +21,9 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
     "    /O|/o:<out file>")
     "    /X|/x:<output xml>")
 
+### /e /s arguments
+The /e and /s arguments are used when you need to transform the paths into the final analysis folder. For example in teamcity its common, that checkout folders to be named like c:\buildagent\<hash>. This hash normally its not guaranted to be the same when you move reports between agents. With this 2 arguments you can transform those path to the paths the sonar analysis actually uses.
+
 ## Output formats
 It generated generic coverage format that you can feed then in sonar using sonar.coverageReportPaths see https://docs.sonarqube.org/display/SONAR/Generic+Test+Data 
 It generates json coverage format for https://github.com/jmecsoftware/sonarqube-testdata-plugin 
