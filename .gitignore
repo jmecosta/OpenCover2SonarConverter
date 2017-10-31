@@ -1,3 +1,5 @@
 packages/
 BuildDrop/
 ObjDrop/
+/.vs/
+/OpenCoverPathConverter/bin/Release/

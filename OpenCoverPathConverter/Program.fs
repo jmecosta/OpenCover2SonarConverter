@@ -25,11 +25,15 @@ let main argv =
         let searchString = arguments.["s"] |> Seq.head
         let fail = arguments.ContainsKey("b")
         files |> Seq.iter (fun c-> 
-                                printf "Convert %s\r\n" c 
-                                OpenCoverConverter.ProcessFile(c, searchString, fail, endPath)
-                                printf "Free memory\r\n"
-                                GC.Collect()
-                                Thread.Sleep(1000))
+                                try
+                                    printf "Convert %s\r\n" c 
+                                    OpenCoverConverter.ProcessFile(c, searchString, fail, endPath)
+                                    printf "Free memory\r\n"
+                                    GC.Collect()
+                                    Thread.Sleep(200)
+                                with
+                                | ex -> printf "Failed to convert %s %s" c ex.Message
+                                )
 
         if File.Exists(endFile) then
             File.Delete(endFile)

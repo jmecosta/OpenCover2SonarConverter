@@ -10,7 +10,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>OpenCoverPathConverter</RootNamespace>
     <AssemblyName>OpenCoverPathConverter</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <Name>OpenCoverPathConverter</Name>
@@ -27,7 +27,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
-    <StartArguments>/r D:\prod\tools\TeklaMSBuildTasks\BuildDrop\OpenCoverPathConverter /p ts_*.xml /e E:\prod\structures\src\work /s Core /o merged.xml</StartArguments>
+    <StartArguments>/b /d \\bc-coverage\opencover_cov\work-opencover /p *.xml /o farmi.merged.json /e E:\prod\structures\src\work /s Core</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -39,10 +39,33 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
-    <StartArguments>/d D:\coveragefiles /p *.xml /e E:\prod\structures\src\work /s Core /o merged.json</StartArguments>
+    <StartArguments>/b /d E:\BuildAgent\work\70ce2e1f4265295a /p *.xml /o nunit.merged.json /e E:\prod\structures\src\work /s Core</StartArguments>
   </PropertyGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <Tailcalls>false</Tailcalls>
+    <OutputPath>$(OutPutPathTasks)\$(AssemblyName)</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
+    <StartArguments>/b /d \\bc-coverage\opencover_cov\work-opencover /p *.xml /o farmi.merged.json /e E:\prod\structures\src\work /s Core</StartArguments>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <Tailcalls>true</Tailcalls>
+    <OutputPath>$(OutPutPathTasks)\$(AssemblyName)</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
+    <StartArguments>/b /d E:\BuildAgent\work\70ce2e1f4265295a /p *.xml /o nunit.merged.json /e E:\prod\structures\src\work /s Core</StartArguments>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '11.0'">
@@ -67,13 +90,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Collections.ParallelSeq">
-      <HintPath>..\refs\FSharp.Collections.ParallelSeq.dll</HintPath>
+      <HintPath>..\packages\FSharp.Collections.ParallelSeq.1.0.2\lib\net40\FSharp.Collections.ParallelSeq.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Data">
-      <HintPath>..\refs\FSharp.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="FSharp.Data.DesignTime">
-      <HintPath>..\refs\FSharp.Data.DesignTime.dll</HintPath>
+      <HintPath>..\packages\FSharp.Data.2.3.3\lib\net40\FSharp.Data.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core">
