@@ -43,6 +43,7 @@ let ShowHelp () =
         Console.WriteLine ("Converts build path in xml files into another path")
         Console.WriteLine ()
         Console.WriteLine ("Options:")
+        Console.WriteLine ("    /W|/w:<base work dir for tia>")
         Console.WriteLine ("    /D|/d:<directory to look for files>")
         Console.WriteLine ("    /P|/p:<Pattern of files to search>")
         Console.WriteLine ("    /E|/e:<End Path to Use for path replacement in Report>")
@@ -50,4 +51,6 @@ let ShowHelp () =
         Console.WriteLine ("    /R|/r:<covert reports : search string>")
         Console.WriteLine ("    /O|/o:<out file>")
         Console.WriteLine ("    /X|/x:<output xml>")
+        Console.WriteLine ("    /I|/i Ignores coverage without tracked tests")
+        Console.WriteLine ("    /G|/g:<Generate Test Impact Analisys : outFile>")
 

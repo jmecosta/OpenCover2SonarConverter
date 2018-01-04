@@ -3,3 +3,11 @@ BuildDrop/
 ObjDrop/
 /.vs/
 /OpenCoverPathConverter/bin/Release/
+**/bin/Debug/
+**/bin/Release/
+**/obj/Release/
+**/obj/Debug/
+/.vscode/
+/.sonarqube/**
+/compile_commands.json
+/.clang-tidy

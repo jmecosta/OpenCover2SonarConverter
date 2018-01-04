@@ -1,11 +1,5 @@
-﻿module OpenCoverConverter
+﻿module OpenCoverXmlHelpers
 
-open System
-open System.IO
-open System.Text
-open System.Xml
-open System.Text.RegularExpressions
-open FSharp.Collections.ParallelSeq
 open FSharp.Data
 
 type OpenCoverXml = XmlProvider<"""
@@ -100,9 +94,17 @@ type OpenCoverXml = XmlProvider<"""
             <Method skippedDueTo="Unknown" visited="false" cyclomaticComplexity="0" nPathComplexity="0" sequenceCoverage="0" branchCoverage="0" isConstructor="false" isStatic="false" isGetter="false" isSetter="false">
               <MetadataToken>100663538</MetadataToken>
               <Name>System.Void ProdWPF.MessageHub/FrameTitleChangedDelegate::EndInvoke(System.IAsyncResult)</Name>
+              <FileRef uid="2368" />
               <SequencePoints>
                 <SequencePoint vc="14" uspid="43" ordinal="0" offset="0" sl="242" sc="13" el="243" ec="59" bec="0" bev="0" fileid="1" />
                 <SequencePoint vc="14" uspid="44" ordinal="1" offset="17" sl="244" sc="9" el="244" ec="10" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="69" uspid="198" ordinal="0" offset="0" sl="82" sc="13" el="82" ec="69" bec="0" bev="0" fileid="6">
+                  <TrackedMethodRefs>
+                    <TrackedMethodRef uid="8" vc="13" />
+                    <TrackedMethodRef uid="10" vc="6" />
+                    <TrackedMethodRef uid="17" vc="2" />
+                  </TrackedMethodRefs>
+                </SequencePoint>
               </SequencePoints>
                 <BranchPoints>
                 <BranchPoint vc="0" uspid="87" ordinal="0" offset="18" sl="264" path="0" offsetend="20" fileid="1" />
@@ -121,269 +123,36 @@ type OpenCoverXml = XmlProvider<"""
                 <BranchPoint vc="0" uspid="104" ordinal="17" offset="462" sl="297" path="1" offsetend="469" fileid="1" />
                 <BranchPoint vc="0" uspid="105" ordinal="18" offset="492" sl="305" path="0" offsetend="494" fileid="1" />
                 <BranchPoint vc="0" uspid="106" ordinal="19" offset="492" sl="305" path="1" offsetend="500" fileid="1" />
+                <BranchPoint vc="2" uspid="62476" ordinal="3" offset="35" sl="94" path="1" offsetend="67" fileid="1804">
+                  <TrackedMethodRefs>
+                    <TrackedMethodRef uid="4" vc="1" />
+                    <TrackedMethodRef uid="5" vc="1" />
+                  </TrackedMethodRefs>
+                </BranchPoint>                
               </BranchPoints>
             </Method>
           </Methods>
         </Class>
        </Classes>
+      <TrackedMethods>
+        <TrackedMethod uid="38" token="100663566" name="System.Void Project.Common.Test.InternalTests.TsControlTestIniFile::TsNotRunningTsStartedOkModelOktsiniInBinFolder()" strategy="NUnitTest" />
+        <TrackedMethod uid="39" token="100663567" name="System.Void Project.Common.Test.InternalTests.TsControlTestIniFile::TsNotRunningTsStartedOkModelOktsiniInModelFolder()" strategy="NUnitTest" />
+        <TrackedMethod uid="40" token="100663568" name="System.Void Project.Common.Test.InternalTests.TsControlTestIniFile::TsNotRunningTsStartedOkModelNOk()" strategy="NUnitTest" />
+        <TrackedMethod uid="41" token="100663569" name="System.Void Project.Common.Test.InternalTests.TsControlTestIniFile::TsStartTimeout()" strategy="NUnitTest" />
+        <TrackedMethod uid="42" token="100663573" name="System.Void Project.Common.Test.InternalTests.ProcessCtrlTest::TestCreateProcessAndKillProcess()" strategy="NUnitTest" />
+        <TrackedMethod uid="43" token="100663579" name="System.Void Project.Common.Test.InternalTests.NunitBaseOpenLoopTests::TestTsStartOk()" strategy="NUnitTest" />
+        <TrackedMethod uid="44" token="100663580" name="System.Void Project.Common.Test.InternalTests.NunitBaseOpenLoopTests::CompareWithPerceptual()" strategy="NUnitTest" />
+        <TrackedMethod uid="45" token="100663581" name="System.Void Project.Common.Test.InternalTests.NunitBaseOpenLoopTests::CompareWithPerceptualWithToleranceBiggerThanValue()" strategy="NUnitTest" />
+        <TrackedMethod uid="46" token="100663586" name="System.Void Project.Common.Test.InternalTests.TsControlTest::TestTsInvalidStartArguments()" strategy="NUnitTest" />
+        <TrackedMethod uid="47" token="100663587" name="System.Void Project.Common.Test.InternalTests.TsControlTest::TestTsStartArguments()" strategy="NUnitTest" />
+        <TrackedMethod uid="48" token="100663588" name="System.Void Project.Common.Test.InternalTests.TsControlTest::StartTsAlreadyRunningModelIsCorrect()" strategy="NUnitTest" />
+        <TrackedMethod uid="49" token="100663589" name="System.Void Project.Common.Test.InternalTests.TsControlTest::StartTsAlreadyRunningModelIsNotCorrectShouldOpenCorrectModel()" strategy="NUnitTest" />
+        <TrackedMethod uid="50" token="100663590" name="System.Void Project.Common.Test.InternalTests.TsControlTest::TsShouldFailedAsIniFileIsNotFound()" strategy="NUnitTest" />
+        <TrackedMethod uid="51" token="100663598" name="System.Void Project.Common.Test.InternalTests.UtilitiesTest::TestReadXmlFile()" strategy="NUnitTest" />
+        <TrackedMethod uid="52" token="100663599" name="System.Void Project.Common.Test.InternalTests.UtilitiesTest::TestReadFromRegister()" strategy="NUnitTest" />
+      </TrackedMethods>
     </Module>
+
   </Modules>
 </CoverageSession>
 """>
-
-type Path(path:int) = 
-    let mutable hits : int = 0
-    member val Path : int = path
-    member this.Hits() = hits
-    member this.SetHits(hitdata:int) = 
-        hits <- hits + hitdata
-
-type OffsetBranch(offset:int) =
-    let mutable paths : Path List = List.Empty
-    member val Offset : int = offset
-
-    member this.GetPaths() = paths
-    member this.AddPath(path:Path) =
-        paths <- paths @ [path]
-
-type Branch() = 
-    let mutable offsets : OffsetBranch List = List.Empty
-
-    member this.GetOffSets() = offsets
-    member this.GetOffSet(offset:int) =
-        offsets |> Seq.tryFind (fun c -> c.Offset = offset)
-
-    member this.AddOffset(offset:OffsetBranch) =
-        offsets <- offsets @ [offset]
-
-type Line(line:int) = 
-    let mutable hits : int = 0
-    let mutable branch : Branch = new Branch()
-
-    member val Line : int = line
-
-    member this.GetOffsetsCover() = 
-        branch.GetOffSets()
-
-    member this.GetBranchsToCover() = 
-        let mutable branchesToCover = 0
-        branch.GetOffSets() |> Seq.iter (fun p -> p.GetPaths() |> Seq.iter (fun p -> branchesToCover <- branchesToCover + 1) )
-        branchesToCover
-
-    member this.GetCoveredBranchs() = 
-        let mutable coveredBranches = 0
-        branch.GetOffSets() |> Seq.iter (fun p -> p.GetPaths() |> Seq.iter (fun p -> if p.Hits() > 0 then coveredBranches <- coveredBranches + 1) )
-        coveredBranches
-
-    member this.GetSequenceHits() = hits
-    member this.SetLineHit(covered:int) =
-        hits <- hits + covered
-
-    member this.SetBranchToCover(path:int, offset:int, hits:int) =
-        let offsetpoint = branch.GetOffSet(offset)
-        match offsetpoint with
-        | Some data ->
-            let pathPoint = data.GetPaths() |> Seq.tryFind (fun elem -> elem.Path = path)
-            match pathPoint with
-            | Some path -> path.SetHits(hits)
-            | _ -> 
-                let newPath = Path(path)
-                newPath.SetHits(hits)
-                data.AddPath(newPath)
-        | _ ->
-            let offset = new OffsetBranch(offset)
-            let newPath = Path(path)
-            newPath.SetHits(hits)
-            offset.AddPath(newPath)
-            branch.AddOffset(offset)
-
-type Coverage(path) =
-    let mutable coverageData : Line list = List.Empty
-    member val Path : String = path
-    member this.GetCoverageData() = 
-        coverageData
-    member this.AddSequenceLineInfo(line:int, hits:int) = 
-        let covpoint = coverageData |> Seq.tryFind (fun elem -> elem.Line = line)
-        match covpoint with
-        | Some data ->
-            data.SetLineHit(hits)
-        | _ ->
-            let newLine = new Line(line)
-            newLine.SetLineHit(hits)
-            coverageData <- coverageData @ [newLine]
-
-    member this.AddBranchCoverageData(line:int, path:int, offset:int, hits:int) = 
-        let covpoint = coverageData |> Seq.tryFind (fun elem -> elem.Line = line)
-        match covpoint with
-        | Some data ->
-            data.SetBranchToCover(path, offset, hits)
-        | _ ->
-            let newLine = new Line(line)
-            newLine.SetBranchToCover(path, offset, hits)
-            coverageData <- coverageData @ [newLine]
-
-let mutable cacheData : Map<string, Coverage> =  Map.empty 
-let mutable idResolver : Map<int, string> = Map.empty
-
-let AddSequencePoint(branchpointdata:OpenCoverXml.SequencePoint) = 
-    let fileId = branchpointdata.Fileid
-    let hits = branchpointdata.Vc
-    let line = branchpointdata.Sl
-    let fileIdPath = idResolver.[fileId]
-    let covpoint = cacheData.[fileIdPath]
-    covpoint.AddSequenceLineInfo(line, hits)
-    ()
-
-let AddBranchPoint(branchpointdata:OpenCoverXml.BranchPoint) =
-    let fileId = branchpointdata.Fileid
-    let hits = branchpointdata.Vc
-    let line = branchpointdata.Sl
-    let offset = branchpointdata.Offset
-    let path = branchpointdata.Path
-    let fileIdPath = idResolver.[fileId]
-    let covpoint = cacheData.[fileIdPath]
-    covpoint.AddBranchCoverageData(line, path, offset, hits)
-
-let ParseMethod(methoddata:OpenCoverXml.Method) =
-    methoddata.BranchPoints
-    |> Seq.iter (fun elem -> AddBranchPoint(elem))
-
-    methoddata.SequencePoints
-    |> Seq.iter (fun elem -> AddSequencePoint(elem))
-
-let ParseClass(classdata:OpenCoverXml.Class)= 
-    classdata.Methods
-    |> Seq.iter (fun elem -> ParseMethod(elem))
-
-let ParseFiles(filedata:OpenCoverXml.File, contertPath:string, endPath:string)= 
-    if not(idResolver.ContainsKey(filedata.Uid)) then
-        if not(cacheData.ContainsKey(filedata.FullPath)) then
-            let cov = new Coverage(filedata.FullPath.Replace(contertPath, endPath))
-            cacheData <- cacheData.Add(filedata.FullPath, cov)
-        idResolver <- idResolver.Add(filedata.Uid, filedata.FullPath)
-
-let ParseModule(moduledata:OpenCoverXml.Module, contertPath:string, endPath:string)= 
-    moduledata.Files 
-    |> Seq.iter (fun elem -> ParseFiles(elem, contertPath, endPath))
-
-    moduledata.Classes
-    |> Seq.iter (fun elem -> ParseClass(elem))
-
-let CollectMergeData(data:OpenCoverXml.CoverageSession, contertPath:string, endPath:string) =
-    data.Modules
-    |> Seq.iter (fun elem -> ParseModule(elem, contertPath, endPath))
-
-
-let ProcessFile(file:string, searchString:string, fail : bool, endPath:string) = 
-    let content = File.ReadAllText(file)
-    GC.Collect()
-    let xmldata = OpenCoverXml.Parse(content)
-    GC.Collect()
-
-    let searchString = "\\" + searchString + "\\"
-
-    let ValidateFullPath(path:string) = 
-        path.Contains(searchString)
-
-    let ValidateModule(modul:OpenCoverXml.Module) = 
-        (modul.Files |> Seq.tryFind (fun file -> ValidateFullPath(file.FullPath))).IsSome
-
-    let mutable convertPath = ""
-    let moduledata = xmldata.Modules |> Seq.tryFind (fun modul -> ValidateModule(modul))
-    match moduledata with
-    | Some data -> 
-        let fileName = (data.Files |> Seq.find (fun file -> ValidateFullPath(file.FullPath)))
-        convertPath <- fileName.FullPath.Split([|searchString|], StringSplitOptions.RemoveEmptyEntries).[0]
-    | _ -> ()
-
-    idResolver <- Map.empty
-    CollectMergeData(xmldata, convertPath, endPath)
-
-
-let CreateMergeCoverageFileJson(file:string) = 
-    let stringBuilder = new StringBuilder()
-    stringBuilder.AppendLine("[") |> ignore
-    let PrintSeqPoint(cov:Line) = 
-        let brachesToCover = cov.GetOffsetsCover()
-        let isCovered = 
-            if cov.GetSequenceHits() > 0 then
-                "true"
-            else
-                "false"
-
-        stringBuilder.AppendLine("      {") |> ignore
-        stringBuilder.AppendLine((sprintf "        \"line\": \"%i\"," cov.Line)) |> ignore
-        stringBuilder.AppendLine((sprintf "        \"covered\": \"%s\"," isCovered)) |> ignore
-        stringBuilder.AppendLine("        \"branches\": [") |> ignore
-
-        let GetBranchData =
-            let retData = new StringBuilder()
-            let mutable branchCnt = 0
-            let ProceedPath(path:Path) = 
-                branchCnt <- branchCnt + 1
-                retData.AppendLine("          {") |> ignore
-                retData.AppendLine((sprintf "            \"branch\": \"%i\"," branchCnt)) |> ignore
-                let isCovered = 
-                    if path.Hits() > 0 then
-                        "true"
-                    else
-                        "false"
-                retData.AppendLine((sprintf "            \"covered\": \"%s\"," isCovered)) |> ignore
-                retData.AppendLine("          },") |> ignore
-
-            brachesToCover |> Seq.iter (fun offset -> offset.GetPaths() |> Seq.iter (fun path -> ProceedPath(path)))
-            retData.AppendLine("        ]") |> ignore
-            retData.ToString()
-
-        stringBuilder.Append(GetBranchData) |> ignore
-        stringBuilder.AppendLine("      },") |> ignore
-
-
-    let PrintCovPoint(cov:Coverage) = 
-        stringBuilder.AppendLine("  {") |> ignore
-        let path = sprintf "    \"file\": \"%s\"," (cov.Path.Replace("\\", "/"))
-        stringBuilder.AppendLine(path) |> ignore
-        stringBuilder.AppendLine("    \"lines\": [") |> ignore
-        cov.GetCoverageData() |> Seq.iter (fun point -> PrintSeqPoint(point))
-        stringBuilder.AppendLine("     ]") |> ignore
-        stringBuilder.AppendLine("  },") |> ignore
-
-    cacheData
-    |> Map.toSeq
-    |> Seq.iter (fun (uid,cov) -> PrintCovPoint(cov))
-    stringBuilder.AppendLine("]") |> ignore
-
-    File.WriteAllText(file, stringBuilder.ToString())
-    let fileToPublish = Path.GetFileName(file)
-    printf "##teamcity[publishArtifacts '%s => Coverage.zip']\r\n" fileToPublish
-
-let CreateMergeCoverageFile(file:string) = 
-    use streamWriter = new StreamWriter(file, false)
-    streamWriter.WriteLine("<coverage version=\"1\">")
-    let PrintSeqPoint(cov:Line) = 
-        let brachesToCover = cov.GetBranchsToCover()
-        let coveredBranchs = cov.GetCoveredBranchs()
-        let isCovered = 
-            if cov.GetSequenceHits() > 0 then
-                "true"
-            else
-                "false"
-
-        let seqpoint = 
-            sprintf "  <lineToCover lineNumber=\"%i\" covered=\"%s\" branchesToCover=\"%i\" coveredBranches=\"%i\"/>" cov.Line isCovered brachesToCover coveredBranchs
-        streamWriter.WriteLine(seqpoint)
-
-
-    let PrintCovPoint(cov:Coverage) = 
-        let path = sprintf "<file path=\"%s\">" cov.Path
-        streamWriter.WriteLine(path)
-        cov.GetCoverageData() |> Seq.iter (fun point -> PrintSeqPoint(point))
-        streamWriter.WriteLine("</file>")
-
-    cacheData
-    |> Map.toSeq
-    |> Seq.iter (fun (uid,cov) -> PrintCovPoint(cov))
-
-    streamWriter.WriteLine("</coverage>")
-    let fileToPublish = Path.GetFileName(file)
-    printf "##teamcity[publishArtifacts '%s => Coverage.zip']\r\n" fileToPublish
