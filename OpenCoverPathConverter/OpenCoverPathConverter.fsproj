@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <Tailcalls>false</Tailcalls>
-    <OutputPath>$(OutPutPathTasks)\$(AssemblyName)</OutputPath>
+    <OutputPath>$(OutPutPathTasks)\OpenCoverConverter</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,7 +33,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <Tailcalls>true</Tailcalls>
-    <OutputPath>$(OutPutPathTasks)\$(AssemblyName)</OutputPath>
+    <OutputPath>$(OutPutPathTasks)\OpenCoverConverter</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -49,23 +49,24 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <Tailcalls>false</Tailcalls>
-    <OutputPath>$(OutPutPathTasks)\$(AssemblyName)</OutputPath>
+    <OutputPath>$(OutPutPathTasks)\OpenCoverConverter</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
-    <StartArguments>/D e: /p coverage-report.xml /d E:\prod\ts-build-master /s /b /o nunit.json /i /s Core /e E:\prod\structures\src\work /g e:\tia.xml /w E:\prod\ts-build-master</StartArguments>
+    <Prefer32Bit>true</Prefer32Bit>
+    <StartArguments>/b /d \\bc-coverage\opencover_cov\work-opencover /p *.xml /o farmi.merged.json /e E:\prod\structures\src\work /s Core</StartArguments>
     <PlatformTarget>x64</PlatformTarget>
-    <StartWorkingDirectory>e:\</StartWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <Tailcalls>true</Tailcalls>
-    <OutputPath>$(OutPutPathTasks)\$(AssemblyName)</OutputPath>
+    <OutputPath>$(OutPutPathTasks)\OpenCoverConverter</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
-    <StartArguments>/D e: /p coverage-report.xml /d E:\prod\ts-build-master /s /b /o nunit.json /i</StartArguments>
+    <Prefer32Bit>true</Prefer32Bit>
+    <StartArguments>/b /d E:\BuildAgent\work\70ce2e1f4265295a /p *.xml /o nunit.merged.json /e E:\prod\structures\src\work /s Core</StartArguments>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <Choose>
@@ -89,12 +90,6 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="CppImpactHelpers">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha003\lib\CppImpactHelpers.dll</HintPath>
-    </Reference>
-    <Reference Include="DotNetImpactHelpers">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha003\lib\DotNetImpactHelpers.dll</HintPath>
-    </Reference>
     <Reference Include="FSharp.Collections.ParallelSeq">
       <HintPath>..\packages\FSharp.Collections.ParallelSeq.1.0.2\lib\net40\FSharp.Collections.ParallelSeq.dll</HintPath>
     </Reference>
@@ -107,10 +102,10 @@
     <Reference Include="FSharp.Data.DesignTime">
       <HintPath>..\packages\fsharpspec.4.4.0.1\lib\FSharp.Data.DesignTime.dll</HintPath>
     </Reference>
-    <Reference Include="GitSourceControlProvider">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha003\lib\GitSourceControlProvider.dll</HintPath>
-    </Reference>
     <Reference Include="mscorlib" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
@@ -119,13 +114,7 @@
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="TestImpactRunnerApi">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha003\lib\TestImpactRunnerApi.dll</HintPath>
-    </Reference>
-    <Reference Include="TiaHelpers">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha003\lib\TiaHelpers.dll</HintPath>
-    </Reference>
-    <Reference Include="TSNunitTestRunner">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha003\lib\TSNunitTestRunner.dll</HintPath>
+      <HintPath>..\packages\TestImpactApi.1.0.0-alpha011\lib\TestImpactRunnerApi.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

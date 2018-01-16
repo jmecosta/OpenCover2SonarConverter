@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="..\configuration.props" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -20,22 +21,49 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <Tailcalls>false</Tailcalls>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <OutputPath>$(OutPutPathTasks)\OpenCoverConverter</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\AssemblyKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <Tailcalls>true</Tailcalls>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <OutputPath>$(OutPutPathTasks)\OpenCoverConverter</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <Tailcalls>false</Tailcalls>
+    <OutputPath>$(OutPutPathTasks)\OpenCoverConverter</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <Tailcalls>true</Tailcalls>
+    <OutputPath>$(OutPutPathTasks)\OpenCoverConverter</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '11.0'">
@@ -56,14 +84,9 @@
     <Compile Include="OpenCoverXmlHelpers.fs" />
     <Compile Include="CoveragePointData.fs" />
     <Compile Include="OpenCoverConverter.fs" />
+    <Compile Include="OpenCoverCoverageProvider.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="CppImpactHelpers">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha003\lib\CppImpactHelpers.dll</HintPath>
-    </Reference>
-    <Reference Include="DotNetImpactHelpers">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha003\lib\DotNetImpactHelpers.dll</HintPath>
-    </Reference>
     <Reference Include="FSharp.Core">
       <HintPath>..\packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll</HintPath>
     </Reference>
@@ -73,10 +96,13 @@
     <Reference Include="FSharp.Data.DesignTime">
       <HintPath>..\packages\fsharpspec.4.4.0.1\lib\FSharp.Data.DesignTime.dll</HintPath>
     </Reference>
-    <Reference Include="GitSourceControlProvider">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha003\lib\GitSourceControlProvider.dll</HintPath>
-    </Reference>
     <Reference Include="mscorlib" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="ParseDiff">
+      <HintPath>..\packages\ParseDiff.1.0.18010.936\lib\ParseDiff.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
@@ -85,13 +111,7 @@
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="TestImpactRunnerApi">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha003\lib\TestImpactRunnerApi.dll</HintPath>
-    </Reference>
-    <Reference Include="TiaHelpers">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha003\lib\TiaHelpers.dll</HintPath>
-    </Reference>
-    <Reference Include="TSNunitTestRunner">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha003\lib\TSNunitTestRunner.dll</HintPath>
+      <HintPath>..\packages\TestImpactApi.1.0.0-alpha013\lib\4.6.1\TestImpactRunnerApi.dll</HintPath>
     </Reference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -4,46 +4,67 @@ open System
 open System.IO
 open System.Text
 open FSharp.Data
-open TestImpactRunnerApi.Tia
+open TestImpactRunnerApi
+open OpenCoverCoverage
+open TestImpactRunnerApi.Json
 
 let CollectMergeData(data:OpenCoverXmlHelpers.OpenCoverXml.CoverageSession, contertPath:string, endPath:string, ignoreUnTrackedCov:bool) =
     data.Modules
-    |> Seq.iter (fun elem -> CoveragePointData.ParseModule(elem, contertPath, endPath, ignoreUnTrackedCov))
+    |> Seq.iter (fun elem -> OpenCoverCoverage.ParseModule(elem, contertPath, endPath, ignoreUnTrackedCov))
 
 let UpdateTestImpactData(trackedReferenceData : Map<string, MethodTrackedRef>,
                          trackedTestMethodsData : Map<string, MethodRef>,
                          idResolver : Map<int, string>,
-                         testImpactMapTests:TiaMap) = 
+                         testImpactMapTests:TiaMapData,
+                         workDir:string,
+                         exclusions: List<string>) = 
 
+    let pathWithoutDrive = workDir.Substring(1)
+    
     // lets populate the test impact map with the cached data from this file
-    let createMapForTestMethod(data:MethodRef) =
-        if not(testImpactMapTests.ImpactTestMap.ContainsKey(data.Name)) then
-            let newImpactedTest = TestImpactMapTest()
-            testImpactMapTests.ImpactTestMap.Add(data.Name, newImpactedTest)
-
-        let impactTest = testImpactMapTests.ImpactTestMap.[data.Name]
-        
+    let createMapForTestMethod(testMethod:MethodRef) =
         let collectUidRef(ref:int, refData:MethodTrackedRef) =
-            if ref = data.Uid then
+            if ref = testMethod.Uid then
+
+                let Excluded(fileName:string) = 
+                    if fileName.Substring(1).Contains(pathWithoutDrive) then
+                        let isInExclusion = exclusions |> Seq.tryFind (fun x -> fileName.Contains(x))
+                        match isInExclusion with
+                        | Some _ -> true
+                        | _ -> false
+                    else
+                        true
 
                 let fileName = idResolver.[refData.FileRef]
-                let newDependency = 
-                    let data = impactTest.Dependencies
-                               |> Seq.tryFind (fun elem -> elem.FileName.Equals(fileName))
+                if not(Excluded(fileName)) then
+                    let newFileDependency =
+                        let data = testImpactMapTests.Files
+                                   |> Seq.tryFind (fun elem -> elem.FileName.Equals(fileName))
+
+                        match data with
+                        | Some value -> value
+                        | _ -> let newFileDep = TiaFileData(fileName)
+                               testImpactMapTests.Files.Add(newFileDep)
+                               newFileDep
+
+                    let newMethodDependency = 
+                        let data = newFileDependency.Methods
+                                   |> Seq.tryFind (fun elem -> elem.Name.Equals(refData.MethodName))
+
+                        match data with
+                        | Some value -> value
+                        | _ -> let newMethodDep = TiaMethodData(refData.MethodName)
+                               newFileDependency.Methods.Add(newMethodDep)
+                               newMethodDep
+
+                    let data = newMethodDependency.Tests
+                                |> Seq.tryFind (fun elem -> elem.Equals(testMethod.Name))
 
                     match data with
-                    | Some value -> value
-                    | _ -> let newTestDep = TestImpactDependency()
-                           newTestDep.FileName <- fileName
-                           newTestDep
-
-                if not(newDependency.Methods.Contains(refData.MethodName)) then
-                    newDependency.Methods.Add(refData.MethodName) |> ignore
-                    impactTest.Dependencies.Add(newDependency) |> ignore
+                    | Some value -> ()
+                    | _ -> newMethodDependency.Tests.Add(testMethod.Name)
 
         let processTrackedMethodsRef(refData:MethodTrackedRef) =
-
-                       
             refData.TrackedTestMethodRefs
             |> Seq.iter (fun element ->  collectUidRef(element, refData))
 
@@ -55,17 +76,20 @@ let UpdateTestImpactData(trackedReferenceData : Map<string, MethodTrackedRef>,
     trackedTestMethodsData
     |> Map.iter (fun _ data -> createMapForTestMethod(data))
 
-let ProcessFile(file:string, searchString:string, fail : bool, endPath:string, ignoreUnTrackedCov:bool, testImpactMapTests:TiaMap) = 
-
-    CoveragePointData.trackedMethodsData <- Map.empty
-    CoveragePointData.trackedReferenceData <- Map.empty
+let ProcessFileForExternalTest(file:string,
+                               searchStringIn:string,
+                               endPath:string,
+                               testImpactMapTests:TiaMapData,
+                               testImpact:ImpactedTest,
+                               exclusions:string List,
+                               workPath:string) = 
 
     let content = File.ReadAllText(file)
     GC.Collect()
     let xmldata = OpenCoverXmlHelpers.OpenCoverXml.Parse(content)
     GC.Collect()
 
-    let searchString = "\\" + searchString + "\\"
+    let searchString = "\\" + searchStringIn + "\\"
 
     let validateFullPath(path:string) = 
         path.Contains(searchString)
@@ -81,15 +105,67 @@ let ProcessFile(file:string, searchString:string, fail : bool, endPath:string, i
         convertPath <- fileName.FullPath.Split([|searchString|], StringSplitOptions.RemoveEmptyEntries).[0]
     | _ -> ()
 
-    CoveragePointData.idResolver <- Map.empty
+    OpenCoverCoverage.idResolver <- Map.empty
+    OpenCoverCoverage.trackedMethodsData <- Map.empty
+
+    let methodData = MethodTrackedRef()
+    methodData.FileRef <- -1
+    methodData.MethodName <- "asda"
+
+    OpenCoverCoverage.trackedReferenceData <- Map.empty.Add("asasd", methodData)
+    CollectMergeData(xmldata, convertPath, endPath, true)
+    UpdateTestImpactData(OpenCoverCoverage.trackedReferenceData,
+                         OpenCoverCoverage.trackedMethodsData,
+                         OpenCoverCoverage.idResolver,
+                         testImpactMapTests,
+                         workPath,
+                         exclusions)
+
+let ProcessFile(file:string,
+                searchStringIn:string,
+                endPath:string,
+                ignoreUnTrackedCov:bool,
+                testImpactMapTests:TiaMapData,
+                exclusions:string List,
+                workPath:string) = 
+
+    let content = File.ReadAllText(file)
+    GC.Collect()
+    let xmldata = OpenCoverXmlHelpers.OpenCoverXml.Parse(content)
+    GC.Collect()
+
+    let searchString = "\\" + searchStringIn + "\\"
+
+    let validateFullPath(path:string) = 
+        path.Contains(searchString)
+
+    let validateModule(modul:OpenCoverXmlHelpers.OpenCoverXml.Module) = 
+        (modul.Files |> Seq.tryFind (fun file -> validateFullPath(file.FullPath))).IsSome
+
+    let mutable convertPath = ""
+    let moduledata = xmldata.Modules |> Seq.tryFind (fun modul -> validateModule(modul))
+    match moduledata with
+    | Some data -> 
+        let fileName = (data.Files |> Seq.find (fun file -> validateFullPath(file.FullPath)))
+        convertPath <- fileName.FullPath.Split([|searchString|], StringSplitOptions.RemoveEmptyEntries).[0]
+    | _ -> ()
+
+    OpenCoverCoverage.idResolver <- Map.empty
+    OpenCoverCoverage.trackedMethodsData <- Map.empty
+    OpenCoverCoverage.trackedReferenceData <- Map.empty
     CollectMergeData(xmldata, convertPath, endPath, ignoreUnTrackedCov)
-    UpdateTestImpactData(CoveragePointData.trackedReferenceData, CoveragePointData.trackedMethodsData, CoveragePointData.idResolver, testImpactMapTests)
+    UpdateTestImpactData(OpenCoverCoverage.trackedReferenceData,
+                         OpenCoverCoverage.trackedMethodsData,
+                         OpenCoverCoverage.idResolver,
+                         testImpactMapTests,
+                         workPath,
+                         exclusions)
 
 
 let CreateMergeCoverageFileJson(file:string) = 
     let stringBuilder = StringBuilder()
     stringBuilder.AppendLine("[") |> ignore
-    let PrintSeqPoint(cov:CoveragePointData.Line) = 
+    let PrintSeqPoint(cov:OpenCoverCoverage.Line) = 
         let brachesToCover = cov.GetOffsetsCover()
         let isCovered = 
             if cov.GetSequenceHits() > 0 then
@@ -105,7 +181,7 @@ let CreateMergeCoverageFileJson(file:string) =
         let GetBranchData =
             let retData = new StringBuilder()
             let mutable branchCnt = 0
-            let ProceedPath(path:CoveragePointData.Path) = 
+            let ProceedPath(path:OpenCoverCoverage.Path) = 
                 branchCnt <- branchCnt + 1
                 retData.AppendLine("          {") |> ignore
                 retData.AppendLine((sprintf "            \"branch\": \"%i\"," branchCnt)) |> ignore
@@ -125,7 +201,7 @@ let CreateMergeCoverageFileJson(file:string) =
         stringBuilder.AppendLine("      },") |> ignore
 
 
-    let PrintCovPoint(cov:CoveragePointData.Coverage) = 
+    let PrintCovPoint(cov:OpenCoverCoverage.Coverage) = 
         stringBuilder.AppendLine("  {") |> ignore
         let path = sprintf "    \"file\": \"%s\"," (cov.Path.Replace("\\", "/"))
         stringBuilder.AppendLine(path) |> ignore
@@ -134,7 +210,7 @@ let CreateMergeCoverageFileJson(file:string) =
         stringBuilder.AppendLine("     ]") |> ignore
         stringBuilder.AppendLine("  },") |> ignore
 
-    CoveragePointData.cacheData
+    OpenCoverCoverage.cacheData
     |> Map.toSeq
     |> Seq.iter (fun (uid,cov) -> PrintCovPoint(cov))
     stringBuilder.AppendLine("]") |> ignore
@@ -146,7 +222,7 @@ let CreateMergeCoverageFileJson(file:string) =
 let CreateMergeCoverageFile(file:string) = 
     use streamWriter = new StreamWriter(file, false)
     streamWriter.WriteLine("<coverage version=\"1\">")
-    let PrintSeqPoint(cov:CoveragePointData.Line) = 
+    let PrintSeqPoint(cov:OpenCoverCoverage.Line) = 
         let brachesToCover = cov.GetBranchsToCover()
         let coveredBranchs = cov.GetCoveredBranchs()
         let isCovered = 
@@ -160,13 +236,13 @@ let CreateMergeCoverageFile(file:string) =
         streamWriter.WriteLine(seqpoint)
 
 
-    let PrintCovPoint(cov:CoveragePointData.Coverage) = 
+    let PrintCovPoint(cov:OpenCoverCoverage.Coverage) = 
         let path = sprintf "<file path=\"%s\">" cov.Path
         streamWriter.WriteLine(path)
         cov.GetCoverageData() |> Seq.iter (fun point -> PrintSeqPoint(point))
         streamWriter.WriteLine("</file>")
 
-    CoveragePointData.cacheData
+    OpenCoverCoverage.cacheData
     |> Map.toSeq
     |> Seq.iter (fun (uid,cov) -> PrintCovPoint(cov))
 

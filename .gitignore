@@ -11,3 +11,5 @@ ObjDrop/
 /.sonarqube/**
 /compile_commands.json
 /.clang-tidy
+*.nupkg
+**/obj/**

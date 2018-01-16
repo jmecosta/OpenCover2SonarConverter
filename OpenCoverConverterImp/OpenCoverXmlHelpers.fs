@@ -58,7 +58,7 @@ type OpenCoverXml = XmlProvider<"""
         </Class>
        </Classes>
     </Module>
-    <Module skippedDueTo="Filter" hash="1A-0D-72-44-61-32-2D-54-98-83-81-C0-BD-43-07-DA-2F-35-5E-35">
+    <Module hash="1A-0D-72-44-61-32-2D-54-98-83-81-C0-BD-43-07-DA-2F-35-5E-35">
       <FullName>C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Xml\v4.0_4.0.0.0__b77a5c561934e089\System.Xml.dll</FullName>
       <ModuleName>System.Xml</ModuleName>
       <Files />

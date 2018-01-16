@@ -1,7 +1,8 @@
-﻿open System
-open System.IO
+﻿open System.IO
+open System
 open System.Threading
-open TestImpactRunnerApi.Tia
+open TestImpactRunnerApi
+open TestImpactRunnerApi.Json
 
 [<EntryPoint>]
 let main argv = 
@@ -26,12 +27,15 @@ let main argv =
 
         let endPath = arguments.["e"] |> Seq.head
         let searchString = arguments.["s"] |> Seq.head
-        let fail = arguments.ContainsKey("b")
-        let tiaMap = new TiaMap()
+
+        let working = arguments.["w"] |> Seq.head
+        let tiamapFile = Path.Combine(working, "tia.json")
+        let tiaMap = if arguments.ContainsKey("g") && File.Exists(tiamapFile) then JsonUtilities.ReadMap(tiamapFile) else TiaMapData()
+
         files |> Seq.iter (fun c-> 
                                 try
                                     printf "Convert %s\r\n" c 
-                                    OpenCoverConverter.ProcessFile(c, searchString, fail, endPath, ignoreCoverageWithoutTracked, tiaMap)
+                                    OpenCoverConverter.ProcessFile(c, searchString, endPath, ignoreCoverageWithoutTracked, tiaMap, List.empty, searchPath)
                                     printf "Free memory\r\n"
                                     GC.Collect()
                                     Thread.Sleep(200)
@@ -50,9 +54,11 @@ let main argv =
 
         printf "##teamcity[publishArtifacts '%s => Coverage.zip']\r\n" fileToPublish
 
-        if arguments.ContainsKey("g") then
-            let working = arguments.["w"] |> Seq.head
-            let endPath = arguments.["g"] |> Seq.head
-            let fileToPublish = TestImpactAnalysisData.GenerateTestAnalysisImpactFile(endPath, CoveragePointData.testFiles, working, tiaMap)
-            printf "##teamcity[publishArtifacts '%s => Coverage.zip']\r\n" fileToPublish
+        if arguments.ContainsKey("g") then 
+            let endPathForTia =  arguments.["g"] |> Seq.head
+            let handles = System.Collections.Generic.List<ICoverageHandle>()
+            let coverageService = TiaCoverageService(tiaMap, working, handles, "json", endPathForTia)
+            coverageService.EnableService <- true
+            let tiaFileToPublish = coverageService.WriteTiaMapToFile()
+            printf "##teamcity[publishArtifacts '%s => Coverage.zip']\r\n" tiaFileToPublish
     0 // return an integer exit code

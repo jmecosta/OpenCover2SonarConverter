@@ -1,6 +1,14 @@
-﻿module CoveragePointData
+﻿module OpenCoverCoverage
 
-open TestImpactRunnerApi.Tia
+type MethodRef() = 
+    member val Uid : int = 0 with get, set
+    member val Name : string = "" with get, set
+
+[<AllowNullLiteral>]
+type MethodTrackedRef() = 
+    member val FileRef : int = 0 with get, set
+    member val MethodName : string = "" with get, set
+    member val TrackedTestMethodRefs : Set<int> = Set.empty
 
 type Path(path:int) = 
     let mutable hits : int = 0
@@ -177,7 +185,13 @@ let ParseClass(classdata:OpenCoverXmlHelpers.OpenCoverXml.Class, ignoreUnTracked
 let ParseFiles(filedata:OpenCoverXmlHelpers.OpenCoverXml.File, contertPath:string, endPath:string)= 
     if not(idResolver.ContainsKey(filedata.Uid)) then
         if not(cacheData.ContainsKey(filedata.FullPath)) then
-            let cov = Coverage(filedata.FullPath.Replace(contertPath, endPath))
+            let convertedPath =
+                if contertPath <> "" then
+                    filedata.FullPath.Replace(contertPath, endPath)
+                else
+                    filedata.FullPath
+
+            let cov = Coverage(convertedPath)
             cacheData <- cacheData.Add(filedata.FullPath, cov)
         idResolver <- idResolver.Add(filedata.Uid, filedata.FullPath)
 
