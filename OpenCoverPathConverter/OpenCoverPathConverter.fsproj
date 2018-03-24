@@ -104,7 +104,10 @@
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="ParseDiff">
+      <HintPath>..\packages\ParseDiff.1.0.18010.936\lib\ParseDiff.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -114,7 +117,7 @@
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="TestImpactRunnerApi">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha011\lib\TestImpactRunnerApi.dll</HintPath>
+      <HintPath>..\packages\TestImpactApi.1.0.0-alpha017\lib\4.6.1\TestImpactRunnerApi.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

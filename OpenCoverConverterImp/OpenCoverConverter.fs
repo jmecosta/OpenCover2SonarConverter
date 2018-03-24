@@ -62,7 +62,7 @@ let UpdateTestImpactData(trackedReferenceData : Map<string, MethodTrackedRef>,
 
                     match data with
                     | Some value -> ()
-                    | _ -> newMethodDependency.Tests.Add(testMethod.Name)
+                    | _ -> newMethodDependency.Tests.Add(TiaTestData(testMethod.Name, "openCover"))
 
         let processTrackedMethodsRef(refData:MethodTrackedRef) =
             refData.TrackedTestMethodRefs

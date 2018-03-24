@@ -59,14 +59,77 @@ type OpenCoverXml = XmlProvider<"""
        </Classes>
     </Module>
     <Module hash="1A-0D-72-44-61-32-2D-54-98-83-81-C0-BD-43-07-DA-2F-35-5E-35">
-      <FullName>C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Xml\v4.0_4.0.0.0__b77a5c561934e089\System.Xml.dll</FullName>
+      <FullName>System.Xml.dll</FullName>
       <ModuleName>System.Xml</ModuleName>
       <Files />
       <Classes>
         <Class>
+          <Summary numSequencePoints="7" visitedSequencePoints="7" numBranchPoints="1" visitedBranchPoints="1" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="1" numClasses="1" visitedMethods="1" numMethods="1" />
+          <FullName>sads</FullName>
+          <Methods>
+            <Method visited="true" cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="false" isStatic="true" isGetter="false" isSetter="false">
+              <Summary numSequencePoints="7" visitedSequencePoints="7" numBranchPoints="1" visitedBranchPoints="1" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken>100663297</MetadataToken>
+              <Name>whatever</Name>
+              <FileRef uid="19823" />
+              <SequencePoints>
+                <SequencePoint vc="1" uspid="870256" ordinal="0" offset="0" sl="12" sc="9" el="12" ec="10" bec="0" bev="0" fileid="19823">
+                  <TrackedMethodRefs>
+                    <TrackedMethodRef uid="29" vc="1" />
+                  </TrackedMethodRefs>
+                </SequencePoint>
+                <SequencePoint vc="1" uspid="870257" ordinal="1" offset="1" sl="15" sc="13" el="15" ec="76" bec="0" bev="0" fileid="19823">
+                  <TrackedMethodRefs>
+                    <TrackedMethodRef uid="29" vc="1" />
+                  </TrackedMethodRefs>
+                </SequencePoint>
+                <SequencePoint vc="1" uspid="870258" ordinal="2" offset="23" sl="16" sc="13" el="16" ec="87" bec="0" bev="0" fileid="19823">
+                  <TrackedMethodRefs>
+                    <TrackedMethodRef uid="29" vc="1" />
+                  </TrackedMethodRefs>
+                </SequencePoint>
+                <SequencePoint vc="1" uspid="870259" ordinal="3" offset="45" sl="17" sc="13" el="17" ec="74" bec="0" bev="0" fileid="19823">
+                  <TrackedMethodRefs>
+                    <TrackedMethodRef uid="29" vc="1" />
+                  </TrackedMethodRefs>
+                </SequencePoint>
+                <SequencePoint vc="1" uspid="870260" ordinal="4" offset="62" sl="18" sc="13" el="18" ec="76" bec="0" bev="0" fileid="19823">
+                  <TrackedMethodRefs>
+                    <TrackedMethodRef uid="29" vc="1" />
+                  </TrackedMethodRefs>
+                </SequencePoint>
+                <SequencePoint vc="1" uspid="870261" ordinal="5" offset="79" sl="20" sc="13" el="20" ec="74" bec="0" bev="0" fileid="19823">
+                  <TrackedMethodRefs>
+                    <TrackedMethodRef uid="29" vc="1" />
+                  </TrackedMethodRefs>
+                </SequencePoint>
+                <SequencePoint vc="1" uspid="870262" ordinal="6" offset="101" sl="22" sc="9" el="22" ec="10" bec="0" bev="0" fileid="19823">
+                  <TrackedMethodRefs>
+                    <TrackedMethodRef uid="29" vc="1" />
+                  </TrackedMethodRefs>
+                </SequencePoint>
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint type="SequencePoint" vc="1" uspid="870256" ordinal="0" offset="0" sl="12" sc="9" el="12" ec="10" bec="0" bev="0" fileid="19823">
+                <TrackedMethodRefs>
+                  <TrackedMethodRef uid="29" vc="1" />
+                  <TrackedMethodRef uid="29" vc="1" />
+                </TrackedMethodRefs>
+              </MethodPoint>
+            </Method>
+            <Method visited="false" cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="0" branchCoverage="0" isConstructor="true" isStatic="false" isGetter="false" isSetter="false">
+              <Summary numSequencePoints="0" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0" branchCoverage="0" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="0" />
+              <MetadataToken>100663298</MetadataToken>
+              <Name>System.Void Tekla.Technology.Akit.UserScript.Script::.ctor()</Name>
+              <SequencePoints />
+              <BranchPoints />
+              <MethodPoint vc="0" uspid="870263" ordinal="0" offset="0" />
+            </Method>
+          </Methods>
+        </Class>
+        <Class>
           <Summary numSequencePoints="0" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0" branchCoverage="0" maxCyclomaticComplexity="0" minCyclomaticComplexity="0" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="0" />
           <FullName>&lt;Module&gt;</FullName>
-
           <Methods />
         </Class>
         <Class>
@@ -130,6 +193,11 @@ type OpenCoverXml = XmlProvider<"""
                   </TrackedMethodRefs>
                 </BranchPoint>                
               </BranchPoints>
+              <MethodPoint vc="1" uspid="870256" ordinal="0" offset="0" sl="12" sc="9" el="12" ec="10" bec="0" bev="0" fileid="19823">
+                <TrackedMethodRefs>
+                  <TrackedMethodRef uid="29" vc="1" />
+                </TrackedMethodRefs>
+              </MethodPoint>
             </Method>
           </Methods>
         </Class>

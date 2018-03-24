@@ -30,7 +30,7 @@ let main argv =
 
         let working = arguments.["w"] |> Seq.head
         let tiamapFile = Path.Combine(working, "tia.json")
-        let tiaMap = if arguments.ContainsKey("g") && File.Exists(tiamapFile) then JsonUtilities.ReadMap(tiamapFile) else TiaMapData()
+        let tiaMap = if arguments.ContainsKey("g") && File.Exists(tiamapFile) then JsonUtilities.ReadMap(working, tiamapFile) else TiaMapData()
 
         files |> Seq.iter (fun c-> 
                                 try

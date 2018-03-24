@@ -84,6 +84,7 @@
     <Compile Include="OpenCoverXmlHelpers.fs" />
     <Compile Include="CoveragePointData.fs" />
     <Compile Include="OpenCoverConverter.fs" />
+    <Compile Include="OpenCoverCoverageCoverByTestProvider.fs" />
     <Compile Include="OpenCoverCoverageProvider.fs" />
   </ItemGroup>
   <ItemGroup>
@@ -111,7 +112,7 @@
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="TestImpactRunnerApi">
-      <HintPath>..\packages\TestImpactApi.1.0.0-alpha013\lib\4.6.1\TestImpactRunnerApi.dll</HintPath>
+      <HintPath>..\packages\TestImpactApi.1.0.0-alpha017\lib\4.6.1\TestImpactRunnerApi.dll</HintPath>
     </Reference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

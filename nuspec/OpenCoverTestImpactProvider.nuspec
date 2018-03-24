@@ -2,7 +2,7 @@
 <package>
     <metadata>
         <id>OpenCoverTestImpactProvider</id>
-        <version>1.0.0-alpha006</version>
+        <version>1.0.0-alpha011</version>
         <authors>Tekla</authors>
         <owners>Tekla</owners>
         <licenseUrl>http://www.tekla.com/terms-and-conditions</licenseUrl>
@@ -14,7 +14,7 @@
         <copyright>Tekla Copyright 2015</copyright>
         <tags>.Net Tekla</tags>
         <dependencies>
-            <dependency id="TestImpactApi" version="1.0.0-alpha013" />
+            <dependency id="TestImpactApi" version="1.0.0-alpha017" />
         </dependencies>
         <references>
             <reference file="OpenCoverConverterImp.dll" />
