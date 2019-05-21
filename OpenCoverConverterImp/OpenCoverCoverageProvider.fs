@@ -25,7 +25,7 @@ type CollectAllCoveredMethodsProvider(openCoverPath:string, workingPath:string) 
         member this.DisableCoverageAfterTest() =
             ()
 
-type CollectAllTrackedTestMethodsProvider(openCoverPath:string, workingPath:string) =
+type CollectAllTrackedTestMethodsProvider(openCoverPath:string, workingPath:string, filter:string, excludebyFile:string, excludedFolders:string, otherArgsForOpenCover:string) =
     let outputReportXml = Path.Combine(workingPath, "openCover.xml")
     interface ICoverageHandle with
         member this.EnableCoverageBeforeTest(): unit = 
@@ -39,8 +39,28 @@ type CollectAllTrackedTestMethodsProvider(openCoverPath:string, workingPath:stri
 
         member this.TransformRunArgumentsForRun(executableIn: string, startupArgumentsIn: string): string * string = 
             let executable = openCoverPath
-            let startupArguments = "-register:user -coverbytest:* -target:" + executableIn + " -targetargs:\"" + startupArgumentsIn + "\" -mergebyhash -output:" +  outputReportXml
-            (executable, startupArguments)
+            let startupArguments = "-hideskipped:File;Filter;Attribute;MissingPdb;All -register:user -coverbytest:* -target:" + executableIn +
+                                   " -targetargs:\"" + startupArgumentsIn + "\" -mergebyhash -output:" +  outputReportXml
+
+            let excludeByFilter =
+                if filter <> "" then
+                    " -excludebyfile:\"" + filter + "\""
+                else
+                    ""
+
+            let excludeByFile =
+                if excludebyFile <> "" then
+                    " -excludebyfile:\"" + excludebyFile + "\""
+                else
+                    ""
+
+            let excludedByDir = 
+                if excludedFolders <> "" then
+                    " -excludedirs:\"" + excludedFolders + "\""
+                else
+                    ""
+
+            (executable, startupArguments + excludeByFilter + excludeByFile + excludedByDir + " " + otherArgsForOpenCover)
 
         member this.DisableCoverageAfterTest() =
             ()
