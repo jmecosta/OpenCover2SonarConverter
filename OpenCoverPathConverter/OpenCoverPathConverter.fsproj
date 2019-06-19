@@ -4,7 +4,7 @@
     <Version>2.0.0-Pre</Version>
     <SignAssembly>false</SignAssembly>
     <OutputType>Exe</OutputType>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageOutputPath>..\BuildDrop</PackageOutputPath>
   </PropertyGroup>
   
@@ -14,7 +14,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="TestImpactApi" Version="3.0.0-pre-001" />
+    <PackageReference Include="TestImpactApi" Version="4.0.0" />
   </ItemGroup>
   
   <ItemGroup>

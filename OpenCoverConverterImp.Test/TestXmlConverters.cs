@@ -18,7 +18,7 @@
         {
             ICoverageHandle converter = new CollectAllCoveredMethodsProvider("", testPath);
             var impactTest = new ImpactedTest();
-            var parseData = converter.GenerateImpactMapForTest(impactTest, new List<string>(), @"c:\");
+            var parseData = converter.GenerateImpactMapForTest(impactTest, new SortedSet<string>(), @"c:\");
             Assert.That(parseData.Files.Count, Is.EqualTo(38));
         }
 
@@ -27,7 +27,7 @@
         {
             ICoverageHandle converter = new CollectAllTrackedTestMethodsProvider("", testPath, "", "", "", "");
             var impactTest = new ImpactedTest();
-            var parseData = converter.GenerateImpactMapForTest(impactTest, new List<string>(), @"c:\");
+            var parseData = converter.GenerateImpactMapForTest(impactTest, new SortedSet<string>(), @"c:\");
             Assert.That(parseData.Files.Count, Is.EqualTo(16));
         }
 
@@ -38,7 +38,7 @@
             var impactTest = new ImpactedTest();
             impactTest.TestName = "TestName";
             impactTest.TestMethod = "TestMethodName";
-            var parseData = converter.GenerateImpactMapForTest(impactTest, new List<string>(), @"c:\");
+            var parseData = converter.GenerateImpactMapForTest(impactTest, new SortedSet<string>(), @"c:\");
             Assert.That(parseData.Files.Count, Is.EqualTo(1));
         }
 
@@ -49,7 +49,7 @@
             var impactTest = new ImpactedTest();
             impactTest.TestName = "TestName";
             impactTest.TestMethod = "AnotherTestMethodName";
-            var parseData = converter.GenerateImpactMapForTest(impactTest, new List<string>(), @"c:\");
+            var parseData = converter.GenerateImpactMapForTest(impactTest, new SortedSet<string>(), @"c:\");
             Assert.That(parseData.Files.Count, Is.EqualTo(0));
         }
     }
