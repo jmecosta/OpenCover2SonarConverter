@@ -12,9 +12,9 @@ type CollectAllCoveredMethodsProvider(openCoverPath:string, workingPath:string) 
             ()
 
         member this.GenerateImpactMapForSession(rootPath:string): TiaMapData = 
-            TiaMapData(rootPath, System.Collections.Generic.List<string>())
+            TiaMapData(rootPath, System.Collections.Generic.SortedSet<string>())
 
-        member this.GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.Generic.List<string>, rootPath:string): TiaMapData = 
+        member this.GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, rootPath:string): TiaMapData = 
             OpenCoverConverterImpHelpers.GenerateImpactMapForTest(test, exclusions, rootPath, outputReportXml)
 
         member this.TransformRunArgumentsForRun(executableIn: string, startupArgumentsIn: string): string * string = 
@@ -32,9 +32,9 @@ type CollectAllTrackedTestMethodsProvider(openCoverPath:string, workingPath:stri
             ()
 
         member this.GenerateImpactMapForSession(rootPath:string): TiaMapData = 
-            TiaMapData(rootPath, System.Collections.Generic.List<string>())
+            TiaMapData(rootPath, System.Collections.Generic.SortedSet<string>())
 
-        member this.GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.Generic.List<string>, rootPath:string): TiaMapData = 
+        member this.GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, rootPath:string): TiaMapData = 
             OpenCoverConverterImpHelpers.GenerateImpactMapForAllTrackedTestMethods(test, exclusions, rootPath, outputReportXml)
 
         member this.TransformRunArgumentsForRun(executableIn: string, startupArgumentsIn: string): string * string = 
@@ -72,9 +72,9 @@ type CollectCoveredMethodsForTestProvider(openCoverPath:string, workingPath:stri
             ()
 
         member this.GenerateImpactMapForSession(rootPath:string): TiaMapData = 
-            TiaMapData(rootPath, System.Collections.Generic.List<string>())
+            TiaMapData(rootPath, System.Collections.Generic.SortedSet<string>())
 
-        member this.GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.Generic.List<string>, rootPath:string): TiaMapData = 
+        member this.GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, rootPath:string): TiaMapData = 
             OpenCoverConverterImpHelpers.GenerateImpactMapForTrackedMethodsByTest(test, exclusions, rootPath, outputReportXml)
 
         member this.TransformRunArgumentsForRun(executableIn: string, startupArgumentsIn: string): string * string = 

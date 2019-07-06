@@ -44,7 +44,7 @@ let UpdateTestImpactData(trackedReferenceData : Map<string, MethodTrackedRef>,
                         match data with
                         | Some value -> value
                         | _ -> let newFileDep = TiaFileData(fileName)
-                               testImpactMapTests.Files.Add(newFileDep)
+                               testImpactMapTests.Files.Add(newFileDep) |> ignore
                                newFileDep
 
                     let newMethodDependency = 
@@ -54,7 +54,7 @@ let UpdateTestImpactData(trackedReferenceData : Map<string, MethodTrackedRef>,
                         match data with
                         | Some value -> value
                         | _ -> let newMethodDep = TiaMethodData(refData.MethodName)
-                               newFileDependency.Methods.Add(newMethodDep)
+                               newFileDependency.Methods.Add(newMethodDep) |> ignore
                                newMethodDep
 
                     let data = newMethodDependency.Tests
@@ -62,7 +62,7 @@ let UpdateTestImpactData(trackedReferenceData : Map<string, MethodTrackedRef>,
 
                     match data with
                     | Some value -> ()
-                    | _ -> newMethodDependency.Tests.Add(TiaTestData(testMethod.Name, "openCover"))
+                    | _ -> newMethodDependency.Tests.Add(TiaTestData(testMethod.Name, "openCover")) |> ignore
 
         let processTrackedMethodsRef(refData:MethodTrackedRef) =
             refData.TrackedTestMethodRefs

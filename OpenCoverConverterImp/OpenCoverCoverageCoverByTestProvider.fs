@@ -11,7 +11,7 @@ let WaitUntilOpenCoverCompletes() =
     while Process.GetProcessesByName("OpenCover.Console").Length > 0 do
         Thread.Sleep(1000)
 
-let GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.Generic.List<string>, rootPath:string, reportFile:string) = 
+let GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, rootPath:string, reportFile:string) = 
     WaitUntilOpenCoverCompletes()
     let tiaMap = TiaMapData(rootPath, exclusions)
     let exclusionsData = (List.ofSeq exclusions)
@@ -56,7 +56,7 @@ let GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.G
                 match depFile with
                 | Some devalue -> devalue
                 | _ ->  let impact = TiaFileData(fileName)
-                        tiaMap.Files.Add(impact)
+                        tiaMap.Files.Add(impact) |> ignore
                         impact
 
             let relevatMethodDep = 
@@ -64,17 +64,17 @@ let GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.G
                 match depMethodOption with
                 | Some depMethod -> depMethod
                 | _ ->  let impactMethod = TiaMethodData(keyForMethod)
-                        relevantFileDep.Methods.Add(impactMethod)
+                        relevantFileDep.Methods.Add(impactMethod) |> ignore
                         impactMethod
 
             let depTestOption = relevatMethodDep.Tests |> Seq.tryFind (fun x -> x.Equals(test.TestName))
             match depTestOption with
             | Some _ -> ()
-            | _ ->  relevatMethodDep.Tests.Add(TiaTestData(test.TestName, "opencover"))
+            | _ ->  relevatMethodDep.Tests.Add(TiaTestData(test.TestName, "opencover")) |> ignore
 
     tiaMap
 
-let GenerateImpactMapForAllTrackedTestMethods(test: ImpactedTest, exclusions:System.Collections.Generic.List<string>, rootPath:string, reportFile:string) = 
+let GenerateImpactMapForAllTrackedTestMethods(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, rootPath:string, reportFile:string) = 
     WaitUntilOpenCoverCompletes()
     let tiaMap = TiaMapData(rootPath, exclusions)
     let exclusionsData = (List.ofSeq exclusions)
@@ -121,7 +121,7 @@ let GenerateImpactMapForAllTrackedTestMethods(test: ImpactedTest, exclusions:Sys
                 match depFile with
                 | Some devalue -> devalue
                 | _ ->  let impact = TiaFileData(fileName)
-                        tiaMap.Files.Add(impact)
+                        tiaMap.Files.Add(impact) |> ignore
                         impact
 
             let relevatMethodDep = 
@@ -129,18 +129,18 @@ let GenerateImpactMapForAllTrackedTestMethods(test: ImpactedTest, exclusions:Sys
                 match depMethodOption with
                 | Some depMethod -> depMethod
                 | _ ->  let impactMethod = TiaMethodData(keyForMethod)
-                        relevantFileDep.Methods.Add(impactMethod)
+                        relevantFileDep.Methods.Add(impactMethod) |> ignore
                         impactMethod
 
             let depTestOption = relevatMethodDep.Tests |> Seq.tryFind (fun x -> x.Equals(test.TestName))
             match depTestOption with
             | Some _ -> ()
-            | _ ->  relevatMethodDep.Tests.Add(TiaTestData(test.TestName, "opencover"))
+            | _ ->  relevatMethodDep.Tests.Add(TiaTestData(test.TestName, "opencover")) |> ignore
 
     tiaMap
 
 
-let GenerateImpactMapForTrackedMethodsByTest(test: ImpactedTest, exclusions:System.Collections.Generic.List<string>, rootPath:string, reportFile:string) = 
+let GenerateImpactMapForTrackedMethodsByTest(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, rootPath:string, reportFile:string) = 
     WaitUntilOpenCoverCompletes()
     let tiaMap = TiaMapData(rootPath, exclusions)
     let exclusionsData = (List.ofSeq exclusions)
@@ -203,19 +203,19 @@ let GenerateImpactMapForTrackedMethodsByTest(test: ImpactedTest, exclusions:Syst
                     | Some depMethod -> depMethod, true
                     | _ ->  let impactMethod = TiaMethodData(keyForMethod)
                             if trackedRefs.IsSome && (trackedRefs.Value.TrackedMethodRefs |> Seq.tryFind (fun x -> trackedMethodRefs.ContainsKey(x.Uid))).IsSome then
-                                relevantFileDep.Methods.Add(impactMethod)
+                                relevantFileDep.Methods.Add(impactMethod) |> ignore
                                 impactMethod,true
                             else
                                 impactMethod,false
 
                 if addTestToDep then
                     if addToTiaMap then
-                        tiaMap.Files.Add(relevantFileDep)                    
+                        tiaMap.Files.Add(relevantFileDep) |> ignore     
 
                     let depTestOption = relevatMethodDep.Tests |> Seq.tryFind (fun x -> x.Equals(test.TestName))
                     match depTestOption with
                     | Some _ -> ()
-                    | _ ->  relevatMethodDep.Tests.Add(TiaTestData(test.TestName, "opencover"))
+                    | _ ->  relevatMethodDep.Tests.Add(TiaTestData(test.TestName, "opencover")) |> ignore
 
     tiaMap
 

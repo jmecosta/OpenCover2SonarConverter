@@ -1,11 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-    <Version>2.0.0-Pre</Version>
+    <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
+    <Version>2.0.0</Version>
     <SignAssembly>false</SignAssembly>
     <OutputType>Exe</OutputType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageOutputPath>..\BuildDrop</PackageOutputPath>
+    <IsTool>true</IsTool>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>OpenCoverPathConverter</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
   </PropertyGroup>
   
   <ItemGroup>
@@ -14,7 +18,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="TestImpactApi" Version="3.0.0-pre-001" />
+    <PackageReference Include="TestImpactApi" Version="4.0.2" />
+    <PackageReference Include="FSharp.Core" Version="4.5.2" />
   </ItemGroup>
   
   <ItemGroup>
