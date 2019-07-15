@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
     <Version>2.0.0-Pre</Version>
     <SignAssembly>false</SignAssembly>
     <OutputType>Exe</OutputType>
@@ -14,10 +14,14 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="TestImpactApi" Version="4.0.0" />
+    <PackageReference Include="TestImpactApi" Version="4.0.2" />
   </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\OpenCoverConverterImp\OpenCoverConverterImp.fsproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="4.5.2" />
   </ItemGroup>
 </Project>
