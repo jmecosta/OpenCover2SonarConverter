@@ -13,3 +13,4 @@ ObjDrop/
 /.clang-tidy
 *.nupkg
 **/obj/**
+*.orig
