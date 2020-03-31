@@ -18,6 +18,9 @@ type CollectAllCoveredMethodsProvider(openCoverPath:string, workingPath:string) 
         member this.GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, rootPath:string, logger:ITestImpactLogger): TiaMapData = 
             OpenCoverConverterImpHelpers.GenerateImpactMapForTest(test, exclusions, rootPath, outputReportXml)
 
+        member this.GenerateImpactMapForTestGivenAReportFile(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, reportFile:string, logger:ITestImpactLogger): TiaMapData = 
+            OpenCoverConverterImpHelpers.GenerateImpactMapForAllTrackedTestMethods(test, exclusions, workingPath, reportFile)
+
         member this.TransformRunArgumentsForRun(executableIn: string, startupArgumentsIn: string, logger:ITestImpactLogger): string * string = 
             let executable = openCoverPath
             let startupArguments = "-register:user -target:" + executableIn + " -targetargs:\"" + startupArgumentsIn + "\" -mergebyhash -output:" +  outputReportXml
@@ -38,6 +41,9 @@ type CollectAllTrackedTestMethodsProvider(openCoverPath:string, workingPath:stri
 
         member this.GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, rootPath:string, logger:ITestImpactLogger): TiaMapData = 
             OpenCoverConverterImpHelpers.GenerateImpactMapForAllTrackedTestMethods(test, exclusions, rootPath, outputReportXml)
+
+        member this.GenerateImpactMapForTestGivenAReportFile(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, reportFile:string, logger:ITestImpactLogger): TiaMapData = 
+            OpenCoverConverterImpHelpers.GenerateImpactMapForAllTrackedTestMethods(test, exclusions, workingPath, reportFile)
 
         member this.TransformRunArgumentsForRun(executableIn: string, startupArgumentsIn: string, logger:ITestImpactLogger): string * string = 
             let executable = openCoverPath
@@ -79,6 +85,9 @@ type CollectCoveredMethodsForTestProvider(openCoverPath:string, workingPath:stri
 
         member this.GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, rootPath:string, logger:ITestImpactLogger): TiaMapData = 
             OpenCoverConverterImpHelpers.GenerateImpactMapForTrackedMethodsByTest(test, exclusions, rootPath, outputReportXml)
+
+        member this.GenerateImpactMapForTestGivenAReportFile(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, reportFile:string, logger:ITestImpactLogger): TiaMapData = 
+            OpenCoverConverterImpHelpers.GenerateImpactMapForAllTrackedTestMethods(test, exclusions, workingPath, reportFile)
 
         member this.TransformRunArgumentsForRun(executableIn: string, startupArgumentsIn: string, logger:ITestImpactLogger): string * string = 
             let executable = openCoverPath

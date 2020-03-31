@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "OpenCoverPathConverter": {
+      "commandName": "Project",
+      "commandLineArgs": "/w E:\\prod\\ts-build /b /d E:\\prod\\ts-build\\coverage /p *.xml /o farmi.merged.json /e E:\\prod\\ts-build /s Core "
+    }
+  }
+}

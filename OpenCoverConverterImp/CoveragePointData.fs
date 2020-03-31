@@ -135,12 +135,13 @@ let AddSequencePoint(seqpointdata:OpenCoverXmlHelpers.OpenCoverXml.SequencePoint
     let fileId = seqpointdata.Fileid
     let hits = seqpointdata.Vc
     let line = seqpointdata.Sl
-    let fileIdPath = idResolver.[fileId]
-    let covpoint = cacheData.[fileIdPath]
-    if ignoreUnTrackedCov && seqpointdata.TrackedMethodRefs.IsNone then
-        covpoint.AddSequenceLineInfo(line, 0)
-    else
-        covpoint.AddSequenceLineInfo(line, hits)
+    if idResolver.ContainsKey(fileId) then
+        let fileIdPath = idResolver.[fileId]
+        let covpoint = cacheData.[fileIdPath]
+        if ignoreUnTrackedCov && seqpointdata.TrackedMethodRefs.IsNone then
+            covpoint.AddSequenceLineInfo(line, 0)
+        else
+            covpoint.AddSequenceLineInfo(line, hits)
 
     ParseSeqTrackedMethodRefs(seqpointdata, method, methodTrack)
 
@@ -150,12 +151,13 @@ let AddBranchPoint(branchpointdata:OpenCoverXmlHelpers.OpenCoverXml.BranchPoint,
     let line = branchpointdata.Sl
     let offset = branchpointdata.Offset
     let path = branchpointdata.Path
-    let fileIdPath = idResolver.[fileId]
-    let covpoint = cacheData.[fileIdPath]
-    if ignoreUnTrackedCov && branchpointdata.TrackedMethodRefs.IsNone then
-        covpoint.AddBranchCoverageData(line, path, offset, 0)
-    else
-        covpoint.AddBranchCoverageData(line, path, offset, hits)
+    if idResolver.ContainsKey(fileId) then
+        let fileIdPath = idResolver.[fileId]
+        let covpoint = cacheData.[fileIdPath]
+        if ignoreUnTrackedCov && branchpointdata.TrackedMethodRefs.IsNone then
+            covpoint.AddBranchCoverageData(line, path, offset, 0)
+        else
+            covpoint.AddBranchCoverageData(line, path, offset, hits)
 
     ParseBranchTrackedMethodRefs(branchpointdata, method, methodTrack)
 

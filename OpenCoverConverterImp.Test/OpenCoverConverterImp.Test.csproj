@@ -10,7 +10,7 @@
     <PackageReference Include="Moq" Version="4.10.1" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
-    <PackageReference Include="TestImpactApi" Version="5.0.0" />
+    <PackageReference Include="TestImpactApi" Version="5.2.0" />
   </ItemGroup>
   
   <ItemGroup>
@@ -18,6 +18,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <None Update="cov-FTC_7.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="openCover.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

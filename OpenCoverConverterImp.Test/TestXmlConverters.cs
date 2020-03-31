@@ -58,5 +58,17 @@
             var parseData = converter.GenerateImpactMapForTest(impactTest, new SortedSet<string>(), @"c:\", mockLogger.Object);
             Assert.That(parseData.Files.Count, Is.EqualTo(0));
         }
+
+        [Test]
+        public void CollectTrackedTestMethodsTestForInvalidNameGiveReport()
+        {
+            var mockLogger = new Mock<ITestImpactLogger>();
+            ICoverageHandle converter = new CollectCoveredMethodsForTestProvider("", @"e:\prod\ts-build");
+            var impactTest = new ImpactedTest();
+            impactTest.TestName = "TestName";
+            impactTest.TestMethod = "AnotherTestMethodName";
+            var parseData = converter.GenerateImpactMapForTestGivenAReportFile(impactTest, new SortedSet<string>(), Path.Combine(testPath, "cov-FTC_7.xml"), mockLogger.Object);
+            Assert.That(parseData.Files.Count, Is.EqualTo(31));
+        }
     }
 }

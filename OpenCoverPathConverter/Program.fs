@@ -3,6 +3,7 @@ open System
 open System.Threading
 open TestImpactRunnerApi
 open TestImpactRunnerApi.Json
+open System.Diagnostics
 
 [<EntryPoint>]
 let main argv = 
@@ -32,16 +33,28 @@ let main argv =
         let tiamapFile = Path.Combine(working, "tia.json")
         let tiaMap = if arguments.ContainsKey("g") && File.Exists(tiamapFile) then JsonUtilities.ReadMap(working, tiamapFile) else TiaMapData()
 
-        files |> Seq.iter (fun c-> 
+        let drives = DriveInfo.GetDrives()
+        let gbConv = 1024 * 1024 * 1024
+
+        let stopwatch = Stopwatch()
+        stopwatch.Start()
+        
+        files |> Seq.iter (fun file-> 
                                 try
-                                    printf "Convert %s\r\n" c 
-                                    OpenCoverConverter.ProcessFile(c, searchString, endPath, ignoreCoverageWithoutTracked, tiaMap, List.empty, searchPath)
-                                    printf "Free memory\r\n"
+                                    printf "Convert %s\r\n" file 
+                                    OpenCoverConverter.ProcessFile(file, searchString, endPath, ignoreCoverageWithoutTracked, tiaMap, List.empty, searchPath)
+                                    printf "Free memory and Delete file from disk\r\n"
                                     GC.Collect()
-                                    Thread.Sleep(200)
+                                    File.Delete(file)
+                                    for drive in drives do
+                                        if file.Contains(drive.Name) then
+                                            let gbSpaceFree = drive.AvailableFreeSpace / int64(gbConv)
+                                            printf "Available Space: %i GB\r\n" gbSpaceFree
                                 with
-                                | ex -> printf "Failed to convert %s %s" c ex.Message
+                                | ex -> printf "Failed to convert %s %s\r\n" file ex.Message
                                 )
+        stopwatch.Stop()
+        printf "Duration %i:%i:%i \r\n" stopwatch.Elapsed.Hours stopwatch.Elapsed.Minutes stopwatch.Elapsed.Seconds
 
         if File.Exists(endFile) then
             File.Delete(endFile)
