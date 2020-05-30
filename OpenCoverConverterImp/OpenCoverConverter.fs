@@ -216,7 +216,7 @@ let CreateMergeCoverageFileJson(file:string) =
     stringBuilder.AppendLine("]") |> ignore
 
     File.WriteAllText(file, stringBuilder.ToString())
-    Path.GetFileName(file)
+    file
 
 
 let CreateMergeCoverageFile(file:string) = 
@@ -247,6 +247,6 @@ let CreateMergeCoverageFile(file:string) =
     |> Seq.iter (fun (uid,cov) -> PrintCovPoint(cov))
 
     streamWriter.WriteLine("</coverage>")
-    Path.GetFileName(file)
+    file
 
 

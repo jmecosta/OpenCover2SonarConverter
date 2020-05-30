@@ -21,15 +21,14 @@ let main argv =
         let files = Directory.GetFiles(searchPath, pattern)
 
         let ignoreCoverageWithoutTracked = arguments.ContainsKey("i")
+        let working = try arguments.["w"] |> Seq.head with | _ -> Environment.CurrentDirectory
 
-        let outFile = arguments.["o"] |> Seq.head
-        let currentPath = Environment.CurrentDirectory
-        let endFile = Path.Combine(currentPath, outFile)
+        let outFile = if Path.IsPathRooted(arguments.["o"] |> Seq.head) then arguments.["o"] |> Seq.head else Path.Combine(working, arguments.["o"] |> Seq.head)
+                
+        let endPath = try arguments.["e"] |> Seq.head with | _ -> ""
+        let searchString = try arguments.["s"] |> Seq.head with | _ -> ""
 
-        let endPath = arguments.["e"] |> Seq.head
-        let searchString = arguments.["s"] |> Seq.head
-
-        let working = arguments.["w"] |> Seq.head
+        
         let tiamapFile = Path.Combine(working, "tia.json")
         let tiaMap = if arguments.ContainsKey("g") && File.Exists(tiamapFile) then JsonUtilities.ReadMap(working, tiamapFile) else TiaMapData()
 
@@ -56,15 +55,15 @@ let main argv =
         stopwatch.Stop()
         printf "Duration %i:%i:%i \r\n" stopwatch.Elapsed.Hours stopwatch.Elapsed.Minutes stopwatch.Elapsed.Seconds
 
-        if File.Exists(endFile) then
-            File.Delete(endFile)
+        if File.Exists(outFile) then
+            File.Delete(outFile)
 
         let fileToPublish = 
             if arguments.ContainsKey("x") then
-                OpenCoverConverter.CreateMergeCoverageFile(endFile)
+                OpenCoverConverter.CreateMergeCoverageFile(outFile)
             else
-                OpenCoverConverter.CreateMergeCoverageFileJson(endFile)
-
+                OpenCoverConverter.CreateMergeCoverageFileJson(outFile)
+        printf "Created: %s\r\n" fileToPublish
         printf "##teamcity[publishArtifacts '%s => Coverage.zip']\r\n" fileToPublish
 
         if arguments.ContainsKey("g") then 
