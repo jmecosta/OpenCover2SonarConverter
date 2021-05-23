@@ -1,9 +1,11 @@
 ﻿open System.IO
 open System
-open System.Threading
 open TestImpactRunnerApi
 open TestImpactRunnerApi.Json
 open System.Diagnostics
+open System.IO.Compression
+open Microsoft.FSharp.Collections
+open FSharp.Collections.ParallelSeq
 
 [<EntryPoint>]
 let main argv = 
@@ -18,7 +20,7 @@ let main argv =
     else
         let searchPath = arguments.["d"] |> Seq.head
         let pattern = arguments.["p"] |> Seq.head
-        let files = Directory.GetFiles(searchPath, pattern)
+        let files = Directory.GetFiles(searchPath, pattern, SearchOption.AllDirectories)
 
         let ignoreCoverageWithoutTracked = arguments.ContainsKey("i")
         let working = try arguments.["w"] |> Seq.head with | _ -> Environment.CurrentDirectory
@@ -40,17 +42,32 @@ let main argv =
         
         files |> Seq.iter (fun file-> 
                                 try
-                                    printf "Convert %s\r\n" file 
-                                    OpenCoverConverter.ProcessFile(file, searchString, endPath, ignoreCoverageWithoutTracked, tiaMap, List.empty, searchPath)
-                                    printf "Free memory and Delete file from disk\r\n"
-                                    GC.Collect()
-                                    File.Delete(file)
-                                    for drive in drives do
-                                        if file.Contains(drive.Name) then
-                                            let gbSpaceFree = drive.AvailableFreeSpace / int64(gbConv)
-                                            printf "Available Space: %i GB\r\n" gbSpaceFree
+                                    printf "Convert %s\r\n" file
+
+                                    let ConverteFile(fileData:string) =
+                                        OpenCoverConverter.ProcessFile(fileData, searchString, endPath, ignoreCoverageWithoutTracked, tiaMap, List.empty, searchPath)
+                                        printf "Free memory and Delete file from disk\r\n"
+                                        GC.Collect()
+                                        File.Delete(fileData)
+                                        for drive in drives do
+                                            if file.Contains(drive.Name) then
+                                                let gbSpaceFree = drive.AvailableFreeSpace / int64(gbConv)
+                                                printf "Available Space: %i GB\r\n" gbSpaceFree
+
+                                    if file.EndsWith(".zip") then
+                                        let parentFolder = Path.GetDirectoryName(file)
+                                        let ExtractFile(file:string) = 
+                                            use archive = ZipFile.Open(file, ZipArchiveMode.Read)                                                
+                                            archive.ExtractToDirectory(parentFolder)
+
+                                        ExtractFile(file)
+                                        File.Delete(file)
+                                        for fileData in Directory.GetFiles(parentFolder, "*.xml") do
+                                            ConverteFile(fileData)
+                                    else
+                                        ConverteFile(file)
                                 with
-                                | ex -> printf "Failed to convert %s %s\r\n" file ex.Message
+                                | ex -> printf "Failed to convert %s %s %s\r\n" file ex.Message ex.StackTrace   
                                 )
         stopwatch.Stop()
         printf "Duration %i:%i:%i \r\n" stopwatch.Elapsed.Hours stopwatch.Elapsed.Minutes stopwatch.Elapsed.Seconds

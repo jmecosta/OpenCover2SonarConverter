@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;net472</TargetFrameworks>
+    <TargetFrameworks>net5</TargetFrameworks>
     <Version>2.0.1</Version>
     <SignAssembly>false</SignAssembly>
     <OutputType>Exe</OutputType>
@@ -8,6 +8,8 @@
     <PackageOutputPath>..\BuildDrop</PackageOutputPath>
     <ToolCommandName>OpenCoverPathConverter</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
+	  <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   
   <ItemGroup>
@@ -16,15 +18,13 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="TestImpactApi" Version="5.2.0" />
-    <PackageReference Include="FSharp.Core" Version="4.5.2" />
+    <PackageReference Include="TestImpactApi" Version="5.2.2" />
+    <PackageReference Include="FSharp.Core" Version="4.7.1" />
+	<PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.1.4" />
   </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\OpenCoverConverterImp\OpenCoverConverterImp.fsproj" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.5.2" />
-  </ItemGroup>
+	
 </Project>

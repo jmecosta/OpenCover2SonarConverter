@@ -184,18 +184,20 @@ let ParseClass(classdata:OpenCoverXmlHelpers.OpenCoverXml.Class, ignoreUnTracked
     classdata.Methods
     |> Seq.iter (fun elem -> ParseMethod(elem, ignoreUnTrackedCov))
 
-let ParseFiles(filedata:OpenCoverXmlHelpers.OpenCoverXml.File, contertPath:string, endPath:string)= 
-    if not(idResolver.ContainsKey(filedata.Uid)) then
-        if not(cacheData.ContainsKey(filedata.FullPath)) then
-            let convertedPath =
-                if contertPath <> "" then
-                    filedata.FullPath.Replace(contertPath, endPath)
-                else
-                    filedata.FullPath
+let ParseFiles(filedata:OpenCoverXmlHelpers.OpenCoverXml.File, contertPath:string, endPath:string) = 
+    let lowerPath = filedata.FullPath.ToLower()
+    if lowerPath.StartsWith(endPath.ToLower()) && not(lowerPath.Contains("objdrop")) then   
+        if not(idResolver.ContainsKey(filedata.Uid)) then
+            if not(cacheData.ContainsKey(filedata.FullPath)) then
+                let convertedPath =
+                    if contertPath <> "" then
+                        filedata.FullPath.Replace(contertPath, endPath)
+                    else
+                        filedata.FullPath
 
-            let cov = Coverage(convertedPath)
-            cacheData <- cacheData.Add(filedata.FullPath, cov)
-        idResolver <- idResolver.Add(filedata.Uid, filedata.FullPath)
+                let cov = Coverage(convertedPath)
+                cacheData <- cacheData.Add(filedata.FullPath, cov)
+            idResolver <- idResolver.Add(filedata.Uid, filedata.FullPath)
 
 let ParseModule(moduledata:OpenCoverXmlHelpers.OpenCoverXml.Module, contertPath:string, endPath:string, ignoreUnTrackedCov:bool)= 
     if moduledata.TrackedMethods.IsSome then
