@@ -6,17 +6,32 @@ open System
 open System.Diagnostics
 open TestImpactRunnerApi.Json
 open System.Threading
+open System.Text
+open System.Xml.Linq
+open System.Web
+open System.Text.RegularExpressions
 
 let WaitUntilOpenCoverCompletes() =    
     while Process.GetProcessesByName("OpenCover.Console").Length > 0 do
         Thread.Sleep(1000)
+
+let ReplaceCharacterSequences (input: string) =
+    let pattern = "&#x([0-9A-Fa-f]+);"
+
+    let replaced = Regex.Replace(input, pattern, fun (m : Match) ->
+        let hexNumber = m.Groups.[1].Value
+        let intValue = Convert.ToInt32(hexNumber, 16)
+        let replacement = sprintf "ObfuscatedFunctionMethod%i" intValue
+        replacement)
+
+    replaced
 
 let GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, rootPath:string, reportFile:string) = 
     WaitUntilOpenCoverCompletes()
     let tiaMap = TiaMapData(rootPath, exclusions)
     let exclusionsData = (List.ofSeq exclusions)
 
-    let content = File.ReadAllText(reportFile)
+    let content = ReplaceCharacterSequences(File.ReadAllText(reportFile))
     GC.Collect()
     let xmldata = OpenCoverXmlHelpers.OpenCoverXml.Parse(content)
     GC.Collect()
@@ -74,12 +89,13 @@ let GenerateImpactMapForTest(test: ImpactedTest, exclusions:System.Collections.G
 
     tiaMap
 
+
 let GenerateImpactMapForAllTrackedTestMethods(test: ImpactedTest, exclusions:System.Collections.Generic.SortedSet<string>, rootPath:string, reportFile:string) = 
     WaitUntilOpenCoverCompletes()
     let tiaMap = TiaMapData(rootPath, exclusions)
     let exclusionsData = (List.ofSeq exclusions)
 
-    let content = File.ReadAllText(reportFile)
+    let content = ReplaceCharacterSequences(File.ReadAllText(reportFile))
     GC.Collect()
     let xmldata = OpenCoverXmlHelpers.OpenCoverXml.Parse(content)
     GC.Collect()
@@ -145,7 +161,7 @@ let GenerateImpactMapForTrackedMethodsByTest(test: ImpactedTest, exclusions:Syst
     let tiaMap = TiaMapData(rootPath, exclusions)
     let exclusionsData = (List.ofSeq exclusions)
 
-    let content = File.ReadAllText(reportFile)
+    let content = ReplaceCharacterSequences(File.ReadAllText(reportFile))
     GC.Collect()
     let xmldata = OpenCoverXmlHelpers.OpenCoverXml.Parse(content)
     GC.Collect()
