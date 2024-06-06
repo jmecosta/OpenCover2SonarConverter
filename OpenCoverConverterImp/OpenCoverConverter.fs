@@ -7,10 +7,22 @@ open FSharp.Data
 open TestImpactRunnerApi
 open OpenCoverCoverage
 open TestImpactRunnerApi.Json
+open System.Text.RegularExpressions
 
 let CollectMergeData(data:OpenCoverXmlHelpers.OpenCoverXml.CoverageSession, contertPath:string, endPath:string, ignoreUnTrackedCov:bool) =
     data.Modules
     |> Seq.iter (fun elem -> OpenCoverCoverage.ParseModule(elem, contertPath, endPath, ignoreUnTrackedCov))
+
+let ReplaceCharacterSequences (input: string) =
+    let pattern = "&#x([0-9A-Fa-f]+);"
+
+    let replaced = Regex.Replace(input, pattern, fun (m : Match) ->
+        let hexNumber = m.Groups.[1].Value
+        let intValue = Convert.ToInt32(hexNumber, 16)
+        let replacement = sprintf "ObfuscatedFunctionMethod%i" intValue
+        replacement)
+
+    replaced
 
 let UpdateTestImpactData(trackedReferenceData : Map<string, MethodTrackedRef>,
                          trackedTestMethodsData : Map<string, MethodRef>,
@@ -84,7 +96,7 @@ let ProcessFileForExternalTest(file:string,
                                exclusions:string List,
                                workPath:string) = 
 
-    let content = File.ReadAllText(file)
+    let content = ReplaceCharacterSequences(File.ReadAllText(file))
     GC.Collect()
     let xmldata = OpenCoverXmlHelpers.OpenCoverXml.Parse(content)
     GC.Collect()
@@ -129,7 +141,7 @@ let ProcessFile(file:string,
                 exclusions:string List,
                 workPath:string) = 
 
-    let content = File.ReadAllText(file)
+    let content = ReplaceCharacterSequences(File.ReadAllText(file))
     GC.Collect()
     let xmldata = OpenCoverXmlHelpers.OpenCoverXml.Parse(content)
     GC.Collect()
