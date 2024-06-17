@@ -30,6 +30,10 @@ let main argv =
         let endPath = try arguments.["e"] |> Seq.head with | _ -> ""
         let searchString = try arguments.["s"] |> Seq.head with | _ -> ""
 
+        let dontDeleteBase = arguments.ContainsKey("z")
+
+        let printMethodTrackingToStdout = try arguments.["y"] |> Seq.head with | _ -> ""
+
         
         let tiamapFile = Path.Combine(working, "tia.json")
         let tiaMap = if arguments.ContainsKey("g") && File.Exists(tiamapFile) then JsonUtilities.ReadMap(working, tiamapFile) else TiaMapData()
@@ -45,7 +49,7 @@ let main argv =
                                     printf "Convert %s\r\n" file
 
                                     let ConverteFile(fileData:string) =
-                                        OpenCoverConverter.ProcessFile(fileData, searchString, endPath, ignoreCoverageWithoutTracked, tiaMap, List.empty, searchPath)
+                                        OpenCoverConverter.ProcessFile(fileData, searchString, endPath, ignoreCoverageWithoutTracked, tiaMap, List.empty, searchPath, printMethodTrackingToStdout)
                                         printf "Free memory and Delete file from disk\r\n"
                                         GC.Collect()
                                         File.Delete(fileData)
@@ -56,12 +60,21 @@ let main argv =
 
                                     if file.EndsWith(".zip") then
                                         let parentFolder = Path.GetDirectoryName(file)
+
+                                        // delete xml files there
+                                        let xmlFiles = Directory.GetFiles(parentFolder, "*.xml")
+                                        for xmlFile in xmlFiles do
+                                            File.Delete(xmlFile)
+
                                         let ExtractFile(file:string) = 
                                             use archive = ZipFile.Open(file, ZipArchiveMode.Read)                                                
                                             archive.ExtractToDirectory(parentFolder)
 
+                        
                                         ExtractFile(file)
-                                        File.Delete(file)
+                                        if not(dontDeleteBase) then
+                                            File.Delete(file)
+
                                         for fileData in Directory.GetFiles(parentFolder, "*.xml") do
                                             ConverteFile(fileData)
                                     else
@@ -73,7 +86,7 @@ let main argv =
         printf "Duration %i:%i:%i \r\n" stopwatch.Elapsed.Hours stopwatch.Elapsed.Minutes stopwatch.Elapsed.Seconds
 
         if File.Exists(outFile) then
-            File.Delete(outFile)
+            File.Delete(outFile) 
 
         let fileToPublish = 
             if arguments.ContainsKey("x") then

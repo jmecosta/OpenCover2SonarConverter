@@ -6,7 +6,7 @@ type MethodRef() =
 
 [<AllowNullLiteral>]
 type MethodTrackedRef() = 
-    member val FileRef : int = 0 with get, set
+    member val FileRef : string = "" with get, set
     member val MethodName : string = "" with get, set
     member val TrackedTestMethodRefs : Set<int> = Set.empty
 
@@ -102,18 +102,18 @@ type Coverage(path) =
             coverageData <- coverageData @ [newLine]
 
 let mutable cacheData : Map<string, Coverage> =  Map.empty 
-let mutable idResolver : Map<int, string> = Map.empty
+let mutable idResolver : Map<string, string> = Map.empty
 let mutable testFiles : Set<string>  = Set.empty
 let mutable trackedMethodsData : Map<string, MethodRef>  = Map.empty
 let mutable trackedReferenceData : Map<string, MethodTrackedRef>  = Map.empty
 
-let GetMethodToTrack(method:OpenCoverXmlHelpers.OpenCoverXml.Method) = 
+let GetMethodToTrack(method:OpenCoverXmlHelpers.OpenCoverXml.Method, fileXmlId:string) = 
 
     if method.FileRef.IsSome then
         let keyMethod = sprintf "%i_%s" method.FileRef.Value.Uid method.Name
         if not(trackedReferenceData.ContainsKey(method.Name)) then
             let methodData = MethodTrackedRef()
-            methodData.FileRef <- method.FileRef.Value.Uid
+            methodData.FileRef <- sprintf "%s-%i" fileXmlId method.FileRef.Value.Uid
             methodData.MethodName <- method.Name
             trackedReferenceData <- trackedReferenceData.Add(keyMethod, methodData)
 
@@ -131,13 +131,26 @@ let ParseBranchTrackedMethodRefs(branchPoint:OpenCoverXmlHelpers.OpenCoverXml.Br
         branchPoint.TrackedMethodRefs.Value.TrackedMethodRefs
         |> Seq.iter (fun elem -> if not(methodTrack.TrackedTestMethodRefs.Contains(elem.Uid)) then methodTrack.TrackedTestMethodRefs.Add(elem.Uid) |> ignore)
 
-let AddSequencePoint(seqpointdata:OpenCoverXmlHelpers.OpenCoverXml.SequencePoint, method:OpenCoverXmlHelpers.OpenCoverXml.Method, ignoreUnTrackedCov:bool, methodTrack:MethodTrackedRef) = 
-    let fileId = seqpointdata.Fileid
+let AddSequencePoint(
+    seqpointdata:OpenCoverXmlHelpers.OpenCoverXml.SequencePoint,
+    method:OpenCoverXmlHelpers.OpenCoverXml.Method,
+    ignoreUnTrackedCov:bool,
+    methodTrack:MethodTrackedRef,
+    xmlReportProvidingCoverage:string,
+    lineAndFileToPrint:string) = 
+
+    let fileId = sprintf "%s-%i" xmlReportProvidingCoverage seqpointdata.Fileid
     let hits = seqpointdata.Vc
     let line = seqpointdata.Sl
     if idResolver.ContainsKey(fileId) then
         let fileIdPath = idResolver.[fileId]
         let covpoint = cacheData.[fileIdPath]
+
+        if lineAndFileToPrint <> ""  then
+            let lineToPrint = sprintf "%s:%i" fileIdPath line
+            if lineToPrint.Contains(lineAndFileToPrint) then
+                printf "[TRACKING FILE AND LINE] %s provides %s wiht %i hits\r\n" xmlReportProvidingCoverage lineToPrint hits
+
         if ignoreUnTrackedCov && seqpointdata.TrackedMethodRefs.IsNone then
             covpoint.AddSequenceLineInfo(line, 0)
         else
@@ -145,12 +158,19 @@ let AddSequencePoint(seqpointdata:OpenCoverXmlHelpers.OpenCoverXml.SequencePoint
 
     ParseSeqTrackedMethodRefs(seqpointdata, method, methodTrack)
 
-let AddBranchPoint(branchpointdata:OpenCoverXmlHelpers.OpenCoverXml.BranchPoint, method:OpenCoverXmlHelpers.OpenCoverXml.Method, ignoreUnTrackedCov:bool, methodTrack:MethodTrackedRef) =
-    let fileId = branchpointdata.Fileid
+let AddBranchPoint(
+    branchpointdata:OpenCoverXmlHelpers.OpenCoverXml.BranchPoint,
+    method:OpenCoverXmlHelpers.OpenCoverXml.Method,
+    ignoreUnTrackedCov:bool,
+    methodTrack:MethodTrackedRef,
+    xmlReportProvidingCoverage:string,
+    lineAndFileToPrint:string) =
+    
     let hits = branchpointdata.Vc
     let line = branchpointdata.Sl
     let offset = branchpointdata.Offset
     let path = branchpointdata.Path
+    let fileId = sprintf "%s-%i" xmlReportProvidingCoverage branchpointdata.Fileid
     if idResolver.ContainsKey(fileId) then
         let fileIdPath = idResolver.[fileId]
         let covpoint = cacheData.[fileIdPath]
@@ -161,15 +181,19 @@ let AddBranchPoint(branchpointdata:OpenCoverXmlHelpers.OpenCoverXml.BranchPoint,
 
     ParseBranchTrackedMethodRefs(branchpointdata, method, methodTrack)
 
-let ParseMethod(methoddata:OpenCoverXmlHelpers.OpenCoverXml.Method, ignoreUnTrackedCov:bool) =
-    let methodTracked = GetMethodToTrack(methoddata)
+let ParseMethod(
+    methoddata:OpenCoverXmlHelpers.OpenCoverXml.Method,
+    ignoreUnTrackedCov:bool,
+    xmlReportProvidingCoverage:string,
+    lineAndFileToPrint:string) =
+    let methodTracked = GetMethodToTrack(methoddata, xmlReportProvidingCoverage)
     methoddata.BranchPoints
-    |> Seq.iter (fun elem -> AddBranchPoint(elem, methoddata, ignoreUnTrackedCov, methodTracked))
+    |> Seq.iter (fun elem -> AddBranchPoint(elem, methoddata, ignoreUnTrackedCov, methodTracked, xmlReportProvidingCoverage, lineAndFileToPrint))
 
     methoddata.SequencePoints
-    |> Seq.iter (fun elem -> AddSequencePoint(elem, methoddata, ignoreUnTrackedCov, methodTracked))
+    |> Seq.iter (fun elem -> AddSequencePoint(elem, methoddata, ignoreUnTrackedCov, methodTracked, xmlReportProvidingCoverage, lineAndFileToPrint))
 
-let ParseTrackedMethod(trackedMethod:OpenCoverXmlHelpers.OpenCoverXml.TrackedMethod)= 
+let ParseTrackedMethod(trackedMethod:OpenCoverXmlHelpers.OpenCoverXml.TrackedMethod, xmlReportProvidingCoverage:string, lineAndFileToPrint:string)= 
     let key = sprintf "%i_%s" trackedMethod.Uid trackedMethod.Name
     if not(trackedMethodsData.ContainsKey(key)) then
         let methodData = MethodRef()
@@ -180,14 +204,15 @@ let ParseTrackedMethod(trackedMethod:OpenCoverXmlHelpers.OpenCoverXml.TrackedMet
     if not(testFiles.Contains(key)) then
         testFiles <- testFiles.Add(key)
 
-let ParseClass(classdata:OpenCoverXmlHelpers.OpenCoverXml.Class, ignoreUnTrackedCov:bool)= 
+let ParseClass(classdata:OpenCoverXmlHelpers.OpenCoverXml.Class, ignoreUnTrackedCov:bool, xmlReportProvidingCoverage:string, lineAndFileToPrint:string)= 
     classdata.Methods
-    |> Seq.iter (fun elem -> ParseMethod(elem, ignoreUnTrackedCov))
+    |> Seq.iter (fun elem -> ParseMethod(elem, ignoreUnTrackedCov, xmlReportProvidingCoverage, lineAndFileToPrint))
 
-let ParseFiles(filedata:OpenCoverXmlHelpers.OpenCoverXml.File, contertPath:string, endPath:string) = 
+let ParseFiles(filedata:OpenCoverXmlHelpers.OpenCoverXml.File, contertPath:string, endPath:string, xmlReportProvidingCoverage:string, lineAndFileToPrint:string) = 
     let lowerPath = filedata.FullPath.ToLower()
-    if lowerPath.StartsWith(endPath.ToLower()) && not(lowerPath.Contains("objdrop")) then   
-        if not(idResolver.ContainsKey(filedata.Uid)) then
+    if lowerPath.StartsWith(endPath.ToLower()) && not(lowerPath.Contains("objdrop")) then
+        let fileId = sprintf "%s-%i" xmlReportProvidingCoverage filedata.Uid
+        if not(idResolver.ContainsKey(fileId)) then
             if not(cacheData.ContainsKey(filedata.FullPath)) then
                 let convertedPath =
                     if contertPath <> "" then
@@ -197,17 +222,17 @@ let ParseFiles(filedata:OpenCoverXmlHelpers.OpenCoverXml.File, contertPath:strin
 
                 let cov = Coverage(convertedPath)
                 cacheData <- cacheData.Add(filedata.FullPath, cov)
-            idResolver <- idResolver.Add(filedata.Uid, filedata.FullPath)
+            idResolver <- idResolver.Add(fileId, filedata.FullPath)
 
-let ParseModule(moduledata:OpenCoverXmlHelpers.OpenCoverXml.Module, contertPath:string, endPath:string, ignoreUnTrackedCov:bool)= 
+let ParseModule(moduledata:OpenCoverXmlHelpers.OpenCoverXml.Module, contertPath:string, endPath:string, ignoreUnTrackedCov:bool, xmlReportProvidingCoverage:string, lineAndFileToPrint:string)= 
     if moduledata.TrackedMethods.IsSome then
         moduledata.TrackedMethods.Value.TrackedMethods
-        |> Seq.iter (fun elem -> ParseTrackedMethod(elem))
+        |> Seq.iter (fun elem -> ParseTrackedMethod(elem, xmlReportProvidingCoverage, lineAndFileToPrint))
 
     moduledata.Files 
-    |> Seq.iter (fun elem -> ParseFiles(elem, contertPath, endPath))
+    |> Seq.iter (fun elem -> ParseFiles(elem, contertPath, endPath, xmlReportProvidingCoverage, lineAndFileToPrint))
 
     moduledata.Classes
-    |> Seq.iter (fun elem -> ParseClass(elem, ignoreUnTrackedCov))
+    |> Seq.iter (fun elem -> ParseClass(elem, ignoreUnTrackedCov, xmlReportProvidingCoverage, lineAndFileToPrint))
 
 

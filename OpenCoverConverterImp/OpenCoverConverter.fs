@@ -9,9 +9,9 @@ open OpenCoverCoverage
 open TestImpactRunnerApi.Json
 open System.Text.RegularExpressions
 
-let CollectMergeData(data:OpenCoverXmlHelpers.OpenCoverXml.CoverageSession, contertPath:string, endPath:string, ignoreUnTrackedCov:bool) =
+let CollectMergeData(data:OpenCoverXmlHelpers.OpenCoverXml.CoverageSession, contertPath:string, endPath:string, ignoreUnTrackedCov:bool, xmlReportProvidingCoverage:string, lineAndFileToPrint:string) =
     data.Modules
-    |> Seq.iter (fun elem -> OpenCoverCoverage.ParseModule(elem, contertPath, endPath, ignoreUnTrackedCov))
+    |> Seq.iter (fun elem -> OpenCoverCoverage.ParseModule(elem, contertPath, endPath, ignoreUnTrackedCov, xmlReportProvidingCoverage, lineAndFileToPrint))
 
 let ReplaceCharacterSequences (input: string) =
     let pattern = "&#x([0-9A-Fa-f]+);"
@@ -26,7 +26,7 @@ let ReplaceCharacterSequences (input: string) =
 
 let UpdateTestImpactData(trackedReferenceData : Map<string, MethodTrackedRef>,
                          trackedTestMethodsData : Map<string, MethodRef>,
-                         idResolver : Map<int, string>,
+                         idResolver : Map<string, string>,
                          testImpactMapTests:TiaMapData,
                          workDir:string,
                          exclusions: List<string>) = 
@@ -121,11 +121,11 @@ let ProcessFileForExternalTest(file:string,
     OpenCoverCoverage.trackedMethodsData <- Map.empty
 
     let methodData = MethodTrackedRef()
-    methodData.FileRef <- -1
+    methodData.FileRef <- ""
     methodData.MethodName <- "asda"
 
     OpenCoverCoverage.trackedReferenceData <- Map.empty.Add("asasd", methodData)
-    CollectMergeData(xmldata, convertPath, endPath, true)
+    CollectMergeData(xmldata, convertPath, endPath, true, file, "")
     UpdateTestImpactData(OpenCoverCoverage.trackedReferenceData,
                          OpenCoverCoverage.trackedMethodsData,
                          OpenCoverCoverage.idResolver,
@@ -139,7 +139,8 @@ let ProcessFile(file:string,
                 ignoreUnTrackedCov:bool,
                 testImpactMapTests:TiaMapData,
                 exclusions:string List,
-                workPath:string) = 
+                workPath:string,
+                logMethodOrVaribleToStdout:string) = 
 
     let content = ReplaceCharacterSequences(File.ReadAllText(file))
     GC.Collect()
@@ -165,7 +166,8 @@ let ProcessFile(file:string,
     OpenCoverCoverage.idResolver <- Map.empty
     OpenCoverCoverage.trackedMethodsData <- Map.empty
     OpenCoverCoverage.trackedReferenceData <- Map.empty
-    CollectMergeData(xmldata, convertPath, endPath, ignoreUnTrackedCov)
+    CollectMergeData(xmldata, convertPath, endPath, ignoreUnTrackedCov, Path.GetFileNameWithoutExtension(file), logMethodOrVaribleToStdout)
+        
     UpdateTestImpactData(OpenCoverCoverage.trackedReferenceData,
                          OpenCoverCoverage.trackedMethodsData,
                          OpenCoverCoverage.idResolver,
@@ -218,7 +220,9 @@ let CreateMergeCoverageFileJson(file:string) =
         let path = sprintf "    \"file\": \"%s\"," (cov.Path.Replace("\\", "/"))
         stringBuilder.AppendLine(path) |> ignore
         stringBuilder.AppendLine("    \"lines\": [") |> ignore
-        cov.GetCoverageData() |> Seq.iter (fun point -> PrintSeqPoint(point))
+        cov.GetCoverageData()
+         |> Seq.sortBy (fun line -> line.Line)
+         |> Seq.iter (fun point -> PrintSeqPoint(point))
         stringBuilder.AppendLine("     ]") |> ignore
         stringBuilder.AppendLine("  },") |> ignore
 

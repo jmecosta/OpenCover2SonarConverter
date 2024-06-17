@@ -37,7 +37,6 @@ let parseArgs (args:string seq) =
     |> Seq.map (fun (n,s) -> (n, s |> Seq.map (fun (_,v) -> v) |> Seq.filter (fun i -> i.Length>0)))
     |> Map.ofSeq
 
-
 let ShowHelp () =
         Console.WriteLine ("Usage: OpenCoverPathConverter [OPTIONS]")
         Console.WriteLine ("Converts build path in xml files into another path")
@@ -53,4 +52,6 @@ let ShowHelp () =
         Console.WriteLine ("    /X|/x:<output xml>")
         Console.WriteLine ("    /I|/i Ignores coverage without tracked tests")
         Console.WriteLine ("    /G|/g:<Generate Test Impact Analisys : outFile>")
+        Console.WriteLine ("    /Z|/z <doestn delete source files>")
+        Console.WriteLine ("    /Y|/y:<track a method to find where it being provided from>")
 
