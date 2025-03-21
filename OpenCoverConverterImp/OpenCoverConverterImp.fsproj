@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>3.0.0</Version>
+    <Version>3.0.2</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>true</SignAssembly>
     <PackageOutputPath>$(OutPutPathTasks)</PackageOutputPath>
@@ -15,7 +15,8 @@
     <Compile Include="OpenCoverCoverageProvider.fs" />
   </ItemGroup>
   <ItemGroup>    
-    <PackageReference Include="TestImpactApi" Version="7.0.0" />
+    <PackageReference Include="TestImpactApi" Version="8.0.0" />
     <PackageReference Include="FSharp.Data" Version="6.3.0" />
+    <PackageReference Update="FSharp.Core" Version="8.0.301" />
   </ItemGroup>
 </Project>
